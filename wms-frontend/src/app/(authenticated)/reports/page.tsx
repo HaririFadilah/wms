@@ -2,8 +2,6 @@
 
 import { DataTable } from "@/components/data-table";
 import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
-
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import api from "@/lib/api";
@@ -54,9 +52,9 @@ export default function ReportsPage() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "habis": return <Badge variant="destructive">Habis</Badge>;
-      case "hampir_habis": return <Badge className="bg-amber-500">Hampir Habis</Badge>;
-      default: return <Badge className="bg-green-500">Aman</Badge>;
+      case "habis": return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(248,113,113,0.15)] text-[#f87171] border border-[rgba(248,113,113,0.25)]">Habis</span>;
+      case "hampir_habis": return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(251,191,36,0.15)] text-[#fbbf24] border border-[rgba(251,191,36,0.25)]">Hampir Habis</span>;
+      default: return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.25)]">Aman</span>;
     }
   };
 
@@ -71,12 +69,12 @@ export default function ReportsPage() {
 
   return (
     <>
-      <PageHeader title="Laporan" description="Ringkasan laporan warehouse" />
+      <PageHeader title="Laporan" description="Generate dan export laporan stok komprehensif" />
 
-      <div className="flex items-center gap-2">
-        <Input type="date" className="w-auto" value={from} onChange={(e) => setFrom(e.target.value)} />
-        <span className="text-muted-foreground">s/d</span>
-        <Input type="date" className="w-auto" value={to} onChange={(e) => setTo(e.target.value)} />
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card backdrop-blur-[10px] flex-wrap">
+        <Input type="date" className="w-[160px] rounded-[10px]" value={from} onChange={(e) => setFrom(e.target.value)} />
+        <span className="text-text2">s/d</span>
+        <Input type="date" className="w-[160px] rounded-[10px]" value={to} onChange={(e) => setTo(e.target.value)} />
       </div>
 
       <Tabs defaultValue="stock">

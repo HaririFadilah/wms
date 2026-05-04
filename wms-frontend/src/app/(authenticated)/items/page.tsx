@@ -2,7 +2,6 @@
 
 import { DataTable } from "@/components/data-table";
 import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,11 +28,11 @@ import { toast } from "sonner";
 const statusBadge = (status: string) => {
   switch (status) {
     case "habis":
-      return <Badge variant="destructive">Habis</Badge>;
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(248,113,113,0.15)] text-[#f87171] border border-[rgba(248,113,113,0.25)]">Habis</span>;
     case "hampir_habis":
-      return <Badge className="bg-amber-500 hover:bg-amber-600">Hampir Habis</Badge>;
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(251,191,36,0.15)] text-[#fbbf24] border border-[rgba(251,191,36,0.25)]">Hampir Habis</span>;
     default:
-      return <Badge className="bg-green-500 hover:bg-green-600">Aman</Badge>;
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.25)]">Aman</span>;
   }
 };
 
@@ -213,17 +212,17 @@ export default function ItemsPage() {
         }
       />
 
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card backdrop-blur-[10px] flex-wrap">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text3" />
           <Input
-            placeholder="Cari barang..."
+            placeholder="Cari nama / kode barang..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9"
+            className="pl-9 w-[220px] rounded-[10px]"
           />
         </div>
       </div>
