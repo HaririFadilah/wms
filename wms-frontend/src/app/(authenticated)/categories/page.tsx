@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import type { Category, PaginatedResponse } from "@/types/api";
-import { Plus, Trash2 } from "lucide-react";
+import { FolderOpen, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -92,9 +92,10 @@ export default function CategoriesPage() {
       <PageHeader
         title="Kategori"
         description="Kelola kategori barang"
-        actions={
+        icon={FolderOpen}
+      >
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger render={<Button />}>
+            <DialogTrigger render={<Button className="rounded-xl bg-primary text-white hover:bg-green-600 shadow-sm" />}>
               <Plus className="h-4 w-4 mr-2" /> Tambah Kategori
             </DialogTrigger>
             <DialogContent>
@@ -127,8 +128,7 @@ export default function CategoriesPage() {
               </form>
             </DialogContent>
           </Dialog>
-        }
-      />
+      </PageHeader>
 
       <DataTable
         columns={columns}

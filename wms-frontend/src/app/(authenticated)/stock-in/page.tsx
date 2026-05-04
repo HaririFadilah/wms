@@ -22,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import type { Item, Location, PaginatedResponse, StockIn } from "@/types/api";
-import { Plus } from "lucide-react";
+import { PackagePlus, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -133,9 +133,10 @@ export default function StockInPage() {
       <PageHeader
         title="Stok Masuk"
         description="Riwayat barang masuk"
-        actions={
+        icon={PackagePlus}
+      >
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger render={<Button />}>
+            <DialogTrigger render={<Button className="rounded-xl bg-primary text-white hover:bg-green-600 shadow-sm" />}>
               <Plus className="h-4 w-4 mr-2" /> Tambah Stok Masuk
             </DialogTrigger>
             <DialogContent>
@@ -229,23 +230,22 @@ export default function StockInPage() {
               </form>
             </DialogContent>
           </Dialog>
-        }
-      />
+      </PageHeader>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card shadow-sm flex-wrap">
         <Input
           type="date"
-          className="w-auto"
+          className="w-[160px] rounded-xl"
           value={from}
           onChange={(e) => {
             setFrom(e.target.value);
             setPage(1);
           }}
         />
-        <span className="text-muted-foreground">s/d</span>
+        <span className="text-text2">s/d</span>
         <Input
           type="date"
-          className="w-auto"
+          className="w-[160px] rounded-xl"
           value={to}
           onChange={(e) => {
             setTo(e.target.value);

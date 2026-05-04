@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import api from "@/lib/api";
 import type { ActivityLog, PaginatedResponse } from "@/types/api";
+import { ClipboardList } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export default function ActivityLogsPage() {
@@ -34,11 +35,11 @@ export default function ActivityLogsPage() {
   useEffect(() => { fetch(); }, [fetch]);
 
   const actionColor = (a: string) => {
-    if (a.includes("in")) return "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.25)]";
-    if (a.includes("out")) return "bg-[rgba(248,113,113,0.15)] text-destructive border border-[rgba(248,113,113,0.25)]";
-    if (a.includes("transfer")) return "bg-[rgba(96,165,250,0.15)] text-[#60a5fa] border border-[rgba(96,165,250,0.25)]";
-    if (a.includes("adjustment")) return "bg-[rgba(251,191,36,0.15)] text-[#fbbf24] border border-[rgba(251,191,36,0.25)]";
-    return "bg-[rgba(167,139,250,0.15)] text-[#a78bfa] border border-[rgba(167,139,250,0.25)]";
+    if (a.includes("in")) return "bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-900";
+    if (a.includes("out")) return "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900";
+    if (a.includes("transfer")) return "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900";
+    if (a.includes("adjustment")) return "bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900";
+    return "bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900";
   };
 
   const columns = [
@@ -69,10 +70,10 @@ export default function ActivityLogsPage() {
 
   return (
     <>
-      <PageHeader title="Riwayat Aktivitas" description="Log semua aktivitas transaksi dan perubahan data" />
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card backdrop-blur-[10px] flex-wrap">
+      <PageHeader title="Riwayat Aktivitas" description="Log semua aktivitas transaksi dan perubahan data" icon={ClipboardList} />
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card shadow-sm flex-wrap">
         <Select value={action || "all"} onValueChange={(v: string | null) => { setAction(!v || v === "all" ? "" : v); setPage(1); }}>
-          <SelectTrigger className="w-[170px] rounded-[10px]"><SelectValue placeholder="Semua Aktivitas" /></SelectTrigger>
+          <SelectTrigger className="w-[170px] rounded-xl"><SelectValue placeholder="Semua Aktivitas" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Aktivitas</SelectItem>
             <SelectItem value="stock_in">Stok Masuk</SelectItem>
@@ -81,8 +82,8 @@ export default function ActivityLogsPage() {
             <SelectItem value="stock_adjustment">Adjustment</SelectItem>
           </SelectContent>
         </Select>
-        <Input type="date" className="w-[160px] rounded-[10px]" value={from} onChange={(e) => { setFrom(e.target.value); setPage(1); }} />
-        <Input type="date" className="w-[160px] rounded-[10px]" value={to} onChange={(e) => { setTo(e.target.value); setPage(1); }} />
+        <Input type="date" className="w-[160px] rounded-xl" value={from} onChange={(e) => { setFrom(e.target.value); setPage(1); }} />
+        <Input type="date" className="w-[160px] rounded-xl" value={to} onChange={(e) => { setTo(e.target.value); setPage(1); }} />
       </div>
       <DataTable columns={columns} data={data} currentPage={page} lastPage={lastPage} onPageChange={setPage} isLoading={loading} />
     </>
