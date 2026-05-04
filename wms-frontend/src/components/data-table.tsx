@@ -36,14 +36,14 @@ export function DataTable<T extends { id: number }>({
 }: DataTableProps<T>) {
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border bg-card backdrop-blur-[10px] overflow-hidden">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-border hover:bg-transparent">
               {columns.map((col) => (
                 <TableHead
                   key={col.key}
-                  className="bg-accent text-[11px] font-semibold uppercase tracking-wider text-text3 h-10 px-4"
+                  className="bg-muted/50 text-[11px] font-semibold uppercase tracking-wider text-text3 h-10 px-4"
                 >
                   {col.label}
                 </TableHead>
@@ -57,7 +57,7 @@ export function DataTable<T extends { id: number }>({
                   colSpan={columns.length}
                   className="text-center py-8 text-muted-foreground"
                 >
-                  Memuat data...
+                  <div className="animate-pulse">Memuat data...</div>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
@@ -71,7 +71,7 @@ export function DataTable<T extends { id: number }>({
               </TableRow>
             ) : (
               data.map((item) => (
-                <TableRow key={item.id} className="border-b border-border hover:bg-accent transition-colors">
+                <TableRow key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                   {columns.map((col) => (
                     <TableCell key={col.key} className="px-4 py-3 text-[13.5px]">
                       {col.render
@@ -96,7 +96,7 @@ export function DataTable<T extends { id: number }>({
               size="sm"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(currentPage - 1)}
-              className="rounded-[10px]"
+              className="rounded-xl"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -105,7 +105,7 @@ export function DataTable<T extends { id: number }>({
               size="sm"
               disabled={currentPage >= lastPage}
               onClick={() => onPageChange(currentPage + 1)}
-              className="rounded-[10px]"
+              className="rounded-xl"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

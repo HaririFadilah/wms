@@ -31,9 +31,9 @@ export default function AuthenticatedLayout({
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex flex-1 flex-col md:ml-60">
+      <div className="flex flex-1 flex-col md:ml-[260px]">
         <Header />
-        <main className="flex-1 p-6 space-y-6 max-w-[1400px]">
+        <main className="flex-1 p-6 space-y-6 max-w-[1440px]">
           {children}
         </main>
       </div>

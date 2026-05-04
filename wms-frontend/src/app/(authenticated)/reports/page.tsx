@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import api from "@/lib/api";
 import type { Item, PaginatedResponse, StockIn, StockOut } from "@/types/api";
+import { ChartBar } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export default function ReportsPage() {
@@ -52,9 +53,9 @@ export default function ReportsPage() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "habis": return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(248,113,113,0.15)] text-[#f87171] border border-[rgba(248,113,113,0.25)]">Habis</span>;
-      case "hampir_habis": return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(251,191,36,0.15)] text-[#fbbf24] border border-[rgba(251,191,36,0.25)]">Hampir Habis</span>;
-      default: return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.25)]">Aman</span>;
+      case "habis": return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900"><span className="h-1.5 w-1.5 rounded-full bg-red-500" />Habis</span>;
+      case "hampir_habis": return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900"><span className="h-1.5 w-1.5 rounded-full bg-orange-500" />Hampir Habis</span>;
+      default: return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-900"><span className="h-1.5 w-1.5 rounded-full bg-green-500" />Aman</span>;
     }
   };
 
@@ -69,12 +70,12 @@ export default function ReportsPage() {
 
   return (
     <>
-      <PageHeader title="Laporan" description="Generate dan export laporan stok komprehensif" />
+      <PageHeader title="Laporan" description="Generate dan export laporan stok komprehensif" icon={ChartBar} />
 
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card backdrop-blur-[10px] flex-wrap">
-        <Input type="date" className="w-[160px] rounded-[10px]" value={from} onChange={(e) => setFrom(e.target.value)} />
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card shadow-sm flex-wrap">
+        <Input type="date" className="w-[160px] rounded-xl" value={from} onChange={(e) => setFrom(e.target.value)} />
         <span className="text-text2">s/d</span>
-        <Input type="date" className="w-[160px] rounded-[10px]" value={to} onChange={(e) => setTo(e.target.value)} />
+        <Input type="date" className="w-[160px] rounded-xl" value={to} onChange={(e) => setTo(e.target.value)} />
       </div>
 
       <Tabs defaultValue="stock">

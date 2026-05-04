@@ -15,7 +15,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import type { Item, Location, PaginatedResponse, StockAdjustment } from "@/types/api";
-import { Plus } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -82,9 +82,9 @@ export default function StockAdjustmentsPage() {
 
   return (
     <>
-      <PageHeader title="Stock Adjustment" description="Penyesuaian stok manual" actions={
+      <PageHeader title="Stock Adjustment" description="Penyesuaian stok manual" icon={SlidersHorizontal}>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger render={<Button />}><Plus className="h-4 w-4 mr-2" /> Adjustment Baru</DialogTrigger>
+          <DialogTrigger render={<Button className="rounded-xl bg-primary text-white hover:bg-green-600 shadow-sm" />}><Plus className="h-4 w-4 mr-2" /> Adjustment Baru</DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Stock Adjustment</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
@@ -131,7 +131,7 @@ export default function StockAdjustmentsPage() {
             </form>
           </DialogContent>
         </Dialog>
-      } />
+      </PageHeader>
       <DataTable columns={columns} data={data} currentPage={page} lastPage={lastPage} onPageChange={setPage} isLoading={loading} />
     </>
   );

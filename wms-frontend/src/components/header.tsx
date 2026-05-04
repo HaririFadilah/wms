@@ -18,20 +18,6 @@ import {
 } from "./ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
-const pageTitles: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/items": "Manajemen Barang",
-  "/categories": "Manajemen Kategori",
-  "/locations": "Lokasi Gudang",
-  "/stock-in": "Stok Masuk",
-  "/stock-out": "Stok Keluar",
-  "/transfers": "Transfer Barang",
-  "/stock-adjustments": "Adjustment Stok",
-  "/reports": "Laporan",
-  "/notifications": "Notifikasi",
-  "/activity-logs": "Riwayat Aktivitas",
-};
-
 export default function Header() {
   const { user, logout } = useAuth();
   const pathname = usePathname();
@@ -48,26 +34,23 @@ export default function Header() {
       .catch(() => {});
   }, [pathname]);
 
-  const pageTitle = pageTitles[pathname] || "WMS";
-
   return (
-    <header className="flex h-[60px] items-center justify-between border-b border-border bg-sidebar px-4 md:px-6 sticky top-0 z-40">
-      <div className="flex items-center gap-4">
+    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6 sticky top-0 z-40">
+      <div className="flex items-center gap-3">
         {/* Mobile menu */}
         <Sheet>
           <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" />}>
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-60 p-0 bg-sidebar">
-            <div className="flex h-16 items-center gap-2.5 border-b border-border px-5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-primary">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
-                  <path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zm-9 9H7v-4h4v4zm6 0h-4v-4h4v4zM20 7H4V5a2 2 0 012-2h12a2 2 0 012 2v2z" />
+          <SheetContent side="left" className="w-[260px] p-0 bg-sidebar">
+            <div className="flex h-16 items-center gap-3 border-b border-border px-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                  <rect x="2" y="7" width="20" height="14" rx="2" />
+                  <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
                 </svg>
               </div>
-              <span className="font-heading text-lg font-bold text-foreground">
-                W<span className="text-primary">M</span>S
-              </span>
+              <span className="font-heading text-lg font-bold text-foreground">WMS</span>
             </div>
             <nav className="flex flex-col gap-1 py-4 px-3">
               {mobileNav.map((item) => {
@@ -77,73 +60,68 @@ export default function Header() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "relative flex items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-[13.5px] font-medium transition-all",
+                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition-all",
                       active
-                        ? "bg-lime-glow text-primary border border-lime-border"
-                        : "text-text2 hover:bg-accent hover:text-foreground border border-transparent"
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-text2 hover:bg-muted hover:text-foreground"
                     )}
                   >
-                    <item.icon className={cn("h-[18px] w-[18px]", active ? "opacity-100" : "opacity-70")} />
+                    <item.icon className={cn("h-[18px] w-[18px]", active && "text-primary")} />
                     {item.label}
-                    {active && (
-                      <span className="absolute right-2.5 h-1.5 w-1.5 rounded-full bg-primary" />
-                    )}
                   </Link>
                 );
               })}
             </nav>
           </SheetContent>
         </Sheet>
-        <h1 className="font-heading text-lg font-bold text-foreground">{pageTitle}</h1>
-      </div>
-      <div className="flex items-center gap-2.5">
+
         {/* Search bar */}
-        <div className="hidden sm:flex items-center gap-2 rounded-[10px] border border-border bg-accent px-3 py-1.5">
-          <Search className="h-3.5 w-3.5 text-text3" />
+        <div className="hidden sm:flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2">
+          <Search className="h-4 w-4 text-text3" />
           <input
             type="text"
             placeholder="Cari barang, lokasi..."
-            className="bg-transparent border-none outline-none text-foreground text-[13px] w-[180px] placeholder:text-text3"
+            className="bg-transparent border-none outline-none text-foreground text-[13px] w-[200px] placeholder:text-text3"
           />
         </div>
+      </div>
 
+      <div className="flex items-center gap-2">
         {/* Theme toggle */}
         {mounted && (
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-input bg-transparent text-text2 hover:bg-accent hover:text-foreground transition-all"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-text2 hover:bg-muted hover:text-foreground transition-all"
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
         )}
 
         {/* Notification bell */}
         <Link href="/notifications" className="relative">
-          <button className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-input bg-transparent text-text2 hover:bg-accent hover:text-foreground transition-all">
+          <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-text2 hover:bg-muted hover:text-foreground transition-all">
             <Bell className="h-4 w-4" />
           </button>
           {unreadCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive border-2 border-sidebar" />
+            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[9px] text-white flex items-center justify-center font-bold">
+              {unreadCount}
+            </span>
           )}
         </Link>
 
         {/* User dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" className="gap-2 px-2" />}>
-            <div className="h-7 w-7 rounded-[10px] bg-gradient-to-br from-primary to-[#2dd4bf] flex items-center justify-center text-xs font-bold text-primary-foreground">
+          <DropdownMenuTrigger render={<Button variant="ghost" className="gap-2 px-2 rounded-xl" />}>
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-xs font-bold text-white shadow-sm">
               {user?.name?.charAt(0)?.toUpperCase()}
             </div>
             <span className="hidden sm:inline text-sm font-medium">{user?.name}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="text-xs text-muted-foreground">
+          <DropdownMenuContent align="end" className="rounded-xl">
+            <DropdownMenuItem className="text-xs text-muted-foreground rounded-lg">
               {user?.email} ({user?.role})
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => logout()}>
+            <DropdownMenuItem onClick={() => logout()} className="rounded-lg">
               <LogOut className="mr-2 h-4 w-4" /> Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

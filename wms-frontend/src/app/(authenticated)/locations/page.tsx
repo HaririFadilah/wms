@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import type { Location, PaginatedResponse } from "@/types/api";
-import { Plus, Trash2 } from "lucide-react";
+import { MapPin, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -92,9 +92,10 @@ export default function LocationsPage() {
       <PageHeader
         title="Lokasi"
         description="Kelola lokasi gudang"
-        actions={
+        icon={MapPin}
+      >
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger render={<Button />}>
+            <DialogTrigger render={<Button className="rounded-xl bg-primary text-white hover:bg-green-600 shadow-sm" />}>
               <Plus className="h-4 w-4 mr-2" /> Tambah Lokasi
             </DialogTrigger>
             <DialogContent>
@@ -127,8 +128,7 @@ export default function LocationsPage() {
               </form>
             </DialogContent>
           </Dialog>
-        }
-      />
+      </PageHeader>
 
       <DataTable
         columns={columns}

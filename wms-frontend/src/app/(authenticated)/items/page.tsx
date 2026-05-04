@@ -21,18 +21,18 @@ import {
 } from "@/components/ui/select";
 import api from "@/lib/api";
 import type { Category, Item, PaginatedResponse } from "@/types/api";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { Box, Plus, Search, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const statusBadge = (status: string) => {
   switch (status) {
     case "habis":
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(248,113,113,0.15)] text-[#f87171] border border-[rgba(248,113,113,0.25)]">Habis</span>;
+      return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900"><span className="h-1.5 w-1.5 rounded-full bg-red-500" />Habis</span>;
     case "hampir_habis":
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(251,191,36,0.15)] text-[#fbbf24] border border-[rgba(251,191,36,0.25)]">Hampir Habis</span>;
+      return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900"><span className="h-1.5 w-1.5 rounded-full bg-orange-500" />Hampir Habis</span>;
     default:
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.25)]">Aman</span>;
+      return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-900"><span className="h-1.5 w-1.5 rounded-full bg-green-500" />Aman</span>;
   }
 };
 
@@ -138,9 +138,10 @@ export default function ItemsPage() {
       <PageHeader
         title="Barang"
         description="Daftar semua barang di warehouse"
-        actions={
+        icon={Box}
+      >
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger render={<Button />}>
+            <DialogTrigger render={<Button className="rounded-xl bg-primary text-white hover:bg-green-600 shadow-sm" />}>
               <Plus className="h-4 w-4 mr-2" /> Tambah Barang
             </DialogTrigger>
             <DialogContent>
@@ -209,10 +210,9 @@ export default function ItemsPage() {
               </form>
             </DialogContent>
           </Dialog>
-        }
-      />
+      </PageHeader>
 
-      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card backdrop-blur-[10px] flex-wrap">
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-border bg-card shadow-sm flex-wrap">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text3" />
           <Input
@@ -222,7 +222,7 @@ export default function ItemsPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9 w-[220px] rounded-[10px]"
+            className="pl-9 w-[220px] rounded-xl"
           />
         </div>
       </div>

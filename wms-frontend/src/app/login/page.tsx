@@ -30,25 +30,25 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
-        <div className="rounded-[20px] border border-border bg-card backdrop-blur-[10px] p-7">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary mb-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
-                <path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zm-9 9H7v-4h4v4zm6 0h-4v-4h4v4zM20 7H4V5a2 2 0 012-2h12a2 2 0 012 2v2z" />
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
+          <div className="flex flex-col items-center mb-7">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary shadow-md mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
+                <line x1="12" y1="11" x2="12" y2="17" />
+                <line x1="9" y1="14" x2="15" y2="14" />
               </svg>
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">
               W<span className="text-primary">M</span>S
             </h1>
-            <p className="text-sm text-text2 mt-1">
-              Warehouse Management System
-            </p>
+            <p className="text-sm text-text2 mt-1">Warehouse Management System</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-[10px] bg-[rgba(248,113,113,0.15)] border border-[rgba(248,113,113,0.25)] p-3 text-sm text-destructive">
+              <div className="rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 p-3 text-sm text-destructive">
                 {error}
               </div>
             )}
@@ -60,7 +60,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@wms.test"
                 required
-                className="rounded-[10px] bg-accent border-input focus:border-primary focus:ring-lime-glow h-10 text-sm"
+                className="rounded-xl bg-muted/50 border-border focus:border-primary h-11 text-sm"
               />
             </div>
             <div className="space-y-1.5">
@@ -71,17 +71,17 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="password"
                 required
-                className="rounded-[10px] bg-accent border-input focus:border-primary focus:ring-lime-glow h-10 text-sm"
+                className="rounded-xl bg-muted/50 border-border focus:border-primary h-11 text-sm"
               />
             </div>
             <Button
               type="submit"
-              className="w-full rounded-[10px] bg-primary text-primary-foreground font-semibold h-10 hover:bg-[#b5f03e] hover:-translate-y-px hover:shadow-[0_4px_16px_rgba(163,230,53,0.3)] transition-all"
+              className="w-full rounded-xl bg-primary text-white font-semibold h-11 hover:bg-green-600 transition-all shadow-md"
               disabled={loading}
             >
               {loading ? "Masuk..." : "Masuk"}
             </Button>
-            <div className="text-xs text-center text-text3 space-y-1">
+            <div className="text-xs text-center text-text3 space-y-1 pt-1">
               <p>Demo: admin@wms.test / password</p>
               <p>Demo: staff@wms.test / password</p>
             </div>

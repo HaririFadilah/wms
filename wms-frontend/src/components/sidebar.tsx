@@ -59,24 +59,28 @@ export default function Sidebar() {
   const { user } = useAuth();
 
   return (
-    <aside className="hidden md:flex w-60 flex-col border-r border-border bg-sidebar fixed inset-y-0 left-0 z-50">
+    <aside className="hidden md:flex w-[260px] flex-col border-r border-border bg-sidebar fixed inset-y-0 left-0 z-50">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2.5 border-b border-border px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-primary">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
-            <path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zm-9 9H7v-4h4v4zm6 0h-4v-4h4v4zM20 7H4V5a2 2 0 012-2h12a2 2 0 012 2v2z" />
+      <div className="flex h-16 items-center gap-3 border-b border-border px-6">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-sm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+            <rect x="2" y="7" width="20" height="14" rx="2" />
+            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
+            <line x1="12" y1="11" x2="12" y2="17" />
+            <line x1="9" y1="14" x2="15" y2="14" />
           </svg>
         </div>
-        <span className="font-heading text-lg font-bold tracking-tight text-foreground">
-          W<span className="text-primary">M</span>S
-        </span>
+        <div>
+          <span className="font-heading text-lg font-bold tracking-tight text-foreground">WMS</span>
+          <p className="text-[10px] text-text2 -mt-0.5">Warehouse System</p>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3">
+      <nav className="flex-1 overflow-y-auto py-5 px-3">
         {navSections.map((section) => (
-          <div key={section.label} className="mb-2">
-            <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-text3">
+          <div key={section.label} className="mb-4">
+            <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-text3 mb-1">
               {section.label}
             </div>
             {section.items.map((item) => {
@@ -86,17 +90,14 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "relative flex items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-[13.5px] font-medium transition-all mb-0.5",
+                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition-all mb-0.5",
                     active
-                      ? "bg-lime-glow text-primary border border-lime-border"
-                      : "text-text2 hover:bg-accent hover:text-foreground border border-transparent"
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                      : "text-text2 hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  <item.icon className={cn("h-[18px] w-[18px]", active ? "opacity-100" : "opacity-70")} />
+                  <item.icon className={cn("h-[18px] w-[18px]", active && "text-primary")} />
                   {item.label}
-                  {active && (
-                    <span className="absolute right-2.5 h-1.5 w-1.5 rounded-full bg-primary" />
-                  )}
                 </Link>
               );
             })}
@@ -106,8 +107,8 @@ export default function Sidebar() {
 
       {/* User card */}
       <div className="border-t border-border px-3 py-4">
-        <div className="flex items-center gap-2.5 rounded-xl bg-accent p-2.5">
-          <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-gradient-to-br from-primary to-[#2dd4bf] text-[13px] font-bold text-primary-foreground shrink-0">
+        <div className="flex items-center gap-3 rounded-xl bg-muted p-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-emerald-400 text-sm font-bold text-white shrink-0 shadow-sm">
             {user?.name?.charAt(0)?.toUpperCase() || "A"}
           </div>
           <div className="flex-1 min-w-0">

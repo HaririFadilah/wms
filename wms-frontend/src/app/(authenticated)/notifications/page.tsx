@@ -42,9 +42,9 @@ export default function NotificationsPage() {
 
   const typeIconBg = (type: string) => {
     switch (type) {
-      case "danger": return "bg-[rgba(248,113,113,0.1)]";
-      case "warning": return "bg-[rgba(251,191,36,0.1)]";
-      default: return "bg-[rgba(96,165,250,0.1)]";
+      case "danger": return "bg-red-50 dark:bg-red-950/20";
+      case "warning": return "bg-orange-50 dark:bg-orange-950/20";
+      default: return "bg-blue-50 dark:bg-blue-950/20";
     }
   };
 
@@ -53,15 +53,15 @@ export default function NotificationsPage() {
       <PageHeader
         title="Notifikasi"
         description={`${data.filter(n => !n.is_read).length} notifikasi belum dibaca`}
-        actions={
-          <Button variant="outline" onClick={readAll} className="rounded-[10px]">
+        icon={Bell}
+      >
+          <Button variant="outline" onClick={readAll} className="rounded-xl">
             <CheckCheck className="h-4 w-4 mr-2" /> Tandai Semua Dibaca
           </Button>
-        }
-      />
+      </PageHeader>
       <div className="space-y-2">
         {data.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card backdrop-blur-[10px] p-12 text-center text-muted-foreground">
+          <div className="rounded-2xl border border-border bg-card shadow-sm p-12 text-center text-muted-foreground">
             Tidak ada notifikasi.
           </div>
         ) : (
@@ -70,8 +70,8 @@ export default function NotificationsPage() {
               key={n.id}
               className={`flex items-start gap-3 p-4 rounded-2xl border transition-colors cursor-pointer ${
                 !n.is_read
-                  ? "bg-lime-glow border-lime-border"
-                  : "bg-card border-border hover:bg-accent"
+                  ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900"
+                  : "bg-card border-border hover:bg-muted/50"
               }`}
               onClick={() => !n.is_read && markRead(n.id)}
             >
@@ -96,8 +96,8 @@ export default function NotificationsPage() {
       </div>
       {lastPage > 1 && (
         <div className="flex justify-center gap-2">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-[10px]">Sebelumnya</Button>
-          <Button variant="outline" size="sm" disabled={page >= lastPage} onClick={() => setPage(page + 1)} className="rounded-[10px]">Selanjutnya</Button>
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-xl">Sebelumnya</Button>
+          <Button variant="outline" size="sm" disabled={page >= lastPage} onClick={() => setPage(page + 1)} className="rounded-xl">Selanjutnya</Button>
         </div>
       )}
     </>
