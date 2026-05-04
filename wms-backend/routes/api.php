@@ -8,12 +8,13 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
 use App\Http\Controllers\StockTransferController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -32,9 +33,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::apiResource('stock-outs', StockOutController::class)->only(['index', 'store']);
         Route::get('/transfers', [StockTransferController::class, 'index']);
         Route::post('/transfers', [StockTransferController::class, 'store']);
+        Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index']);
+        Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store']);
     });
 
     Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll']);
 

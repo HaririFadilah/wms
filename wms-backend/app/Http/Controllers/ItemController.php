@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreItemRequest;
+use App\Http\Requests\UpdateItemRequest;
+use App\Http\Resources\ItemResource;
+use App\Http\Resources\ItemStockResource;
 use App\Models\Item;
 use Illuminate\Http\Request;
 
@@ -22,48 +26,34 @@ class ItemController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        $items = $query->latest()->get();
+        $perPage = $request->integer('per_page', 20);
+        $items = $query->latest()->paginate($perPage);
 
         if ($status = $request->string('status')->toString()) {
-            $items = $items->filter(fn (Item $item): bool => $item->status === $status)->values();
+            $filtered = $items->getCollection()->filter(fn (Item $item): bool => $item->status === $status)->values();
+            $items->setCollection($filtered);
         }
 
-        return $items;
+        return ItemResource::collection($items);
     }
 
-    public function store(Request $request)
+    public function store(StoreItemRequest $request)
     {
-        $data = $request->validate([
-            'code' => ['nullable', 'string', 'max:50', 'unique:items,code'],
-            'name' => ['required', 'string', 'max:150'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'unit' => ['required', 'string', 'max:30'],
-            'image' => ['nullable', 'string', 'max:255'],
-            'minimum_stock' => ['required', 'integer', 'min:0'],
-        ]);
+        $item = Item::create($request->validated());
 
-        return response()->json(Item::create($data)->load(['category', 'stocks.location']), 201);
+        return new ItemResource($item->load(['category', 'stocks.location']));
     }
 
     public function show(Item $item)
     {
-        return $item->load(['category', 'stocks.location']);
+        return new ItemResource($item->load(['category', 'stocks.location']));
     }
 
-    public function update(Request $request, Item $item)
+    public function update(UpdateItemRequest $request, Item $item)
     {
-        $data = $request->validate([
-            'code' => ['sometimes', 'required', 'string', 'max:50', 'unique:items,code,'.$item->id],
-            'name' => ['sometimes', 'required', 'string', 'max:150'],
-            'category_id' => ['sometimes', 'required', 'exists:categories,id'],
-            'unit' => ['sometimes', 'required', 'string', 'max:30'],
-            'image' => ['nullable', 'string', 'max:255'],
-            'minimum_stock' => ['sometimes', 'required', 'integer', 'min:0'],
-        ]);
+        $item->update($request->validated());
 
-        $item->update($data);
-
-        return $item->load(['category', 'stocks.location']);
+        return new ItemResource($item->load(['category', 'stocks.location']));
     }
 
     public function destroy(Item $item)
@@ -75,6 +65,6 @@ class ItemController extends Controller
 
     public function stocks(Item $item)
     {
-        return $item->stocks()->with('location')->get();
+        return ItemStockResource::collection($item->stocks()->with('location')->get());
     }
 }

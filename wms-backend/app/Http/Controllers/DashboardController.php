@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ItemResource;
+use App\Http\Resources\StockInResource;
+use App\Http\Resources\StockOutResource;
+use App\Http\Resources\StockTransferResource;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\StockIn;
 use App\Models\StockOut;
 use App\Models\StockTransfer;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
@@ -24,21 +29,42 @@ class DashboardController extends Controller
                 'low_stock' => $items->where('status', 'hampir_habis')->count(),
                 'out_of_stock' => $items->where('status', 'habis')->count(),
             ],
-            'stock_flow' => [
-                'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei'],
-                'in' => [320, 410, 390, 520, 480],
-                'out' => [240, 300, 280, 380, 350],
-            ],
+            'stock_flow' => $this->stockFlow(),
             'location_distribution' => Location::with('stocks')->get()->map(fn (Location $location): array => [
                 'id' => $location->id,
                 'name' => $location->name,
                 'total_stock' => $location->total_stock,
                 'color' => $location->color,
             ]),
-            'recent_transfers' => StockTransfer::with(['item', 'fromLocation', 'toLocation'])->latest()->limit(5)->get(),
-            'stock_alerts' => $items->filter(fn (Item $item): bool => in_array($item->status, ['habis', 'hampir_habis'], true))->values(),
-            'recent_stock_in' => StockIn::with(['item', 'location'])->latest()->limit(5)->get(),
-            'recent_stock_out' => StockOut::with(['item', 'location'])->latest()->limit(5)->get(),
+            'recent_transfers' => StockTransferResource::collection(
+                StockTransfer::with(['item', 'fromLocation', 'toLocation', 'user'])->latest()->limit(5)->get()
+            ),
+            'stock_alerts' => ItemResource::collection(
+                $items->filter(fn (Item $item): bool => in_array($item->status, ['habis', 'hampir_habis'], true))->values()
+            ),
+            'recent_stock_in' => StockInResource::collection(
+                StockIn::with(['item', 'location', 'user'])->latest()->limit(5)->get()
+            ),
+            'recent_stock_out' => StockOutResource::collection(
+                StockOut::with(['item', 'location', 'user'])->latest()->limit(5)->get()
+            ),
+        ];
+    }
+
+    private function stockFlow(): array
+    {
+        $months = collect(range(5, 0))->map(fn (int $i) => Carbon::now()->subMonths($i));
+
+        $labels = $months->map(fn (Carbon $d) => $d->translatedFormat('M Y'))->values()->all();
+
+        $inData = $months->map(fn (Carbon $d) => (int) StockIn::whereYear('date', $d->year)->whereMonth('date', $d->month)->sum('quantity'))->values()->all();
+
+        $outData = $months->map(fn (Carbon $d) => (int) StockOut::whereYear('date', $d->year)->whereMonth('date', $d->month)->sum('quantity'))->values()->all();
+
+        return [
+            'labels' => $labels,
+            'in' => $inData,
+            'out' => $outData,
         ];
     }
 }

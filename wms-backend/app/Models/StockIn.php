@@ -14,7 +14,18 @@ class StockIn extends Model
         return ['date' => 'date'];
     }
 
-    public function item(): BelongsTo { return $this->belongsTo(Item::class); }
-    public function location(): BelongsTo { return $this->belongsTo(Location::class); }
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
