@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WMS — Warehouse Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --lime: #a3e635;
+  --lime-dim: #84cc16;
+  --lime-glow: rgba(163,230,53,0.15);
+  --lime-border: rgba(163,230,53,0.3);
+  --bg: #0f1117;
+  --bg2: #161b25;
+  --bg3: #1e2535;
+  --bg4: #252d3d;
+  --surface: #1a2030;
+  --surface2: #202840;
+  --card: rgba(30,37,55,0.8);
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f2f8;
+  --text2: #8892a4;
+  --text3: #55627a;
+  --red: #f87171;
+  --amber: #fbbf24;
+  --blue: #60a5fa;
+  --teal: #2dd4bf;
+  --purple: #a78bfa;
+  --success: #4ade80;
+  --font: 'DM Sans', sans-serif;
+  --font2: 'Space Grotesk', sans-serif;
+  --r: 12px;
+  --r2: 16px;
+  --r3: 20px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow2: 0 8px 40px rgba(0,0,0,0.5);
+}
+.light {
+  --bg: #f4f6fb;
+  --bg2: #eef0f8;
+  --bg3: #e5e8f5;
+  --bg4: #dde1f0;
+  --surface: #ffffff;
+  --surface2: #f8faff;
+  --card: rgba(255,255,255,0.9);
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text: #0f1420;
+  --text2: #4a5568;
+  --text3: #8896b0;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow2: 0 8px 40px rgba(0,0,0,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px;transition:background .3s,color .3s;overflow-x:hidden}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:width .3s,transform .3s}
+.sidebar-logo{padding:24px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:36px;height:36px;background:var(--lime);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon svg{width:20px;height:20px;fill:var(--bg)}
+.logo-text{font-family:var(--font2);font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+.logo-text span{color:var(--lime)}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:8px}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:8px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;color:var(--text2);transition:all .2s;margin-bottom:2px;position:relative;text-decoration:none;font-size:13.5px;font-weight:500}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--lime-glow);color:var(--lime);border:1px solid var(--lime-border)}
+.nav-item.active .nav-dot{display:block}
+.nav-dot{display:none;position:absolute;right:10px;width:6px;height:6px;background:var(--lime);border-radius:50%}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:20px;font-size:10px;padding:2px 6px;font-weight:600}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--bg3);cursor:pointer}
+.user-avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--lime) 0%,var(--teal) 100%);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--bg);flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--text2)}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;min-height:100vh;transition:margin .3s}
+.topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:99}
+.page-title{font-family:var(--font2);font-size:18px;font-weight:700;flex:1;color:var(--text)}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.btn-icon{width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .2s;position:relative}
+.btn-icon:hover{background:var(--bg3);color:var(--text)}
+.notif-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
+.theme-toggle{width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .2s}
+.theme-toggle:hover{background:var(--bg3);color:var(--text)}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--text2)}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:13px;width:180px}
+.search-bar input::placeholder{color:var(--text3)}
+
+/* CONTENT */
+.content{padding:24px;max-width:1400px}
+.page{display:none}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;backdrop-filter:blur(10px);transition:all .2s}
+.card:hover{border-color:var(--border2)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+
+/* STAT CARDS */
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:all .3s}
+.stat-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.08;background:var(--accent)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--border2)}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500}
+.stat-value{font-family:var(--font2);font-size:26px;font-weight:700;color:var(--text);line-height:1.1}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-change{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:8px}
+.stat-change.up{background:rgba(74,222,128,.15);color:var(--success)}
+.stat-change.down{background:rgba(248,113,113,.15);color:var(--red)}
+.stat-change.warn{background:rgba(251,191,36,.15);color:var(--amber)}
+
+/* CHART */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.chart-title{font-family:var(--font2);font-size:15px;font-weight:600}
+.chart-legend{display:flex;gap:16px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.chart-wrap{position:relative;height:200px}
+
+/* TABLE */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.table-title{font-family:var(--font2);font-size:15px;font-weight:600}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;background:var(--bg3);white-space:nowrap}
+td{padding:12px 16px;border-top:1px solid var(--border);font-size:13.5px;color:var(--text);white-space:nowrap;vertical-align:middle}
+tr:hover td{background:var(--bg3)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.25)}
+.badge-red{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.25)}
+.badge-amber{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
+.badge-blue{background:rgba(96,165,250,.15);color:#60a5fa;border:1px solid rgba(96,165,250,.25)}
+.badge-lime{background:rgba(163,230,53,.15);color:#a3e635;border:1px solid rgba(163,230,53,.25)}
+.badge-purple{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.25)}
+.badge-teal{background:rgba(45,212,191,.15);color:#2dd4bf;border:1px solid rgba(45,212,191,.25)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;font-family:var(--font);font-size:13.5px;font-weight:500;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--lime);color:var(--bg);font-weight:600}
+.btn-primary:hover{background:#b5f03e;transform:translateY(-1px);box-shadow:0 4px 16px rgba(163,230,53,.3)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-danger{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+.btn-danger:hover{background:rgba(248,113,113,.25)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:6px}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.form-input{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:all .2s}
+.form-input:focus{border-color:var(--lime);box-shadow:0 0 0 3px var(--lime-glow)}
+.form-input::placeholder{color:var(--text3)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238892a4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r3);padding:28px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .2s ease}
+.modal-lg{max-width:720px}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-family:var(--font2);font-size:18px;font-weight:700}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .2s}
+.modal-close:hover{background:var(--bg3)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+
+/* NOTIFICATION */
+.notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:340px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);box-shadow:var(--shadow2);z-index:200;overflow:hidden;display:none}
+.notif-dropdown.open{display:block;animation:slideDown .15s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}}
+.notif-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.notif-head-title{font-weight:600;font-size:14px}
+.notif-list{max-height:340px;overflow-y:auto}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;display:flex;gap:10px;align-items:flex-start}
+.notif-item:hover{background:var(--bg3)}
+.notif-item.unread{background:rgba(163,230,53,.04);border-left:2px solid var(--lime)}
+.notif-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-text{flex:1;min-width:0}
+.notif-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;line-height:1.4}
+.notif-time{font-size:11px;color:var(--text3)}
+.notif-dot{width:7px;height:7px;background:var(--lime);border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* TRANSFER PAGE */
+.transfer-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r3);padding:28px;transition:border-color .2s}
+.transfer-arrow{display:flex;align-items:center;justify-content:center;margin:8px 0}
+.transfer-arrow-icon{width:40px;height:40px;background:var(--lime-glow);border:1px solid var(--lime-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--lime)}
+.stock-info{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:8px}
+.stock-info-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.stock-info-label{font-size:12px;color:var(--text2)}
+.stock-info-value{font-family:var(--font2);font-size:16px;font-weight:600}
+.progress-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.progress-fill.safe{background:var(--lime)}
+.progress-fill.warn{background:var(--amber)}
+.progress-fill.danger{background:var(--red)}
+
+/* ACTIVITY LOG */
+.activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.activity-line{position:relative}
+.activity-time{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* SECTION */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:var(--font2);font-size:16px;font-weight:700}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:16px;flex-wrap:wrap}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-icon{width:64px;height:64px;margin:0 auto 16px;background:var(--bg3);border-radius:16px;display:flex;align-items:center;justify-content:center}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;min-width:300px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--shadow2);animation:toastIn .3s ease}
+.toast.success{border-left:3px solid var(--lime)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.warning{border-left:3px solid var(--amber)}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}}
+
+/* LOCATION CARD */
+.loc-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;transition:all .2s;cursor:pointer}
+.loc-card:hover{border-color:var(--lime-border);transform:translateY(-2px)}
+.loc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:22px}
+.loc-name{font-family:var(--font2);font-weight:600;font-size:15px;margin-bottom:4px}
+.loc-desc{font-size:12px;color:var(--text2);margin-bottom:14px}
+.loc-stats{display:flex;gap:12px}
+.loc-stat{text-align:center;flex:1;background:var(--bg3);border-radius:8px;padding:8px 4px}
+.loc-stat-value{font-weight:700;font-size:16px;font-family:var(--font2);color:var(--text)}
+.loc-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .sidebar{width:200px}
+  .main{margin-left:200px}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:240px}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .grid-4,.grid-3,.grid-2{grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .content{padding:16px}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* PULSE ANIMATION */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+
+/* SPIN */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
+
+/* AVATAR */
+.avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+
+/* Page header */
+.page-header{margin-bottom:24px}
+.page-header-title{font-family:var(--font2);font-size:24px;font-weight:700;margin-bottom:4px}
+.page-header-sub{color:var(--text2);font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zm-9 9H7v-4h4v4zm6 0h-4v-4h4v4zM20 7H4V5a2 2 0 012-2h12a2 2 0 012 2v2z"/></svg>
+    </div>
+    <span class="logo-text">W<span>M</span>S</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Utama</div>
+      <a class="nav-item active" onclick="showPage('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+        <span class="nav-dot"></span>
+      </a>
+      <a class="nav-item" onclick="showPage('notifications')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 17H9v1a3 3 0 006 0v-1zM9 17H5l1.5-2.5V9a5.5 5.5 0 0111 0v5.5L19 17h-4"/></svg>
+        Notifikasi
+        <span class="nav-badge">5</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Inventori</div>
+      <a class="nav-item" onclick="showPage('items')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        Barang
+      </a>
+      <a class="nav-item" onclick="showPage('categories')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h8m-8 6h16"/></svg>
+        Kategori
+      </a>
+      <a class="nav-item" onclick="showPage('locations')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Lokasi Gudang
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Transaksi</div>
+      <a class="nav-item" onclick="showPage('stock-in')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m0-16l-4 4m4-4l4 4"/><path d="M4 12H2a10 10 0 0020 0h-2"/></svg>
+        Stok Masuk
+      </a>
+      <a class="nav-item" onclick="showPage('stock-out')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V4m0 16l-4-4m4 4l4-4"/><path d="M4 12H2a10 10 0 0020 0h-2"/></svg>
+        Stok Keluar
+      </a>
+      <a class="nav-item" onclick="showPage('transfer')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+        Transfer Barang
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Laporan</div>
+      <a class="nav-item" onclick="showPage('history')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Riwayat
+      </a>
+      <a class="nav-item" onclick="showPage('reports')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H4a2 2 0 01-2-2V6a2 2 0 012-2h5m0 7v3m0-3h6m-6 0V4m6 7H9m6 0h3a2 2 0 012 2v3a2 2 0 01-2 2h-3m0 0v3m0-3H9m0 3v-3"/></svg>
+        Laporan
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">AD</div>
+      <div class="user-info">
+        <div class="user-name">Admin Gudang</div>
+        <div class="user-role">Administrator</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93L4.93 19.07M12 2v2m0 18v2m8-10h2M2 12H4"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button onclick="toggleSidebar()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text);padding:4px" id="menu-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="page-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-actions">
+      <div class="search-bar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Cari barang, lokasi...">
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+        <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <div style="position:relative">
+        <button class="btn-icon" onclick="toggleNotif()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 17H9v1a3 3 0 006 0v-1zM9 17H5l1.5-2.5V9a5.5 5.5 0 0111 0v5.5L19 17h-4"/></svg>
+          <span class="notif-badge" id="notif-badge"></span>
+        </button>
+        <!-- NOTIF DROPDOWN -->
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-head">
+            <span class="notif-head-title">Notifikasi</span>
+            <button class="btn btn-xs btn-outline" onclick="markAllRead()">Tandai dibaca</button>
+          </div>
+          <div class="notif-list" id="notif-list"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- =================== DASHBOARD =================== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-header-title">Selamat pagi, Admin 👋</div>
+        <div class="page-header-sub">Berikut ringkasan aktivitas gudang hari ini</div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="grid-4">
+        <div class="stat-card" style="--accent:var(--lime)" onclick="showPage('items')">
+          <div class="stat-icon" style="background:var(--lime-glow)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          </div>
+          <div class="stat-label">Total Barang</div>
+          <div class="stat-value">247</div>
+          <span class="stat-change up">↑ 12 barang baru</span>
+        </div>
+        <div class="stat-card" style="--accent:var(--blue)" onclick="showPage('categories')">
+          <div class="stat-icon" style="background:rgba(96,165,250,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M4 6h16M4 12h8m-8 6h16"/></svg>
+          </div>
+          <div class="stat-label">Total Kategori</div>
+          <div class="stat-value">12</div>
+          <span class="stat-change up">↑ 2 baru bulan ini</span>
+        </div>
+        <div class="stat-card" style="--accent:var(--amber)" onclick="showPage('items')">
+          <div class="stat-icon" style="background:rgba(251,191,36,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-label">Hampir Habis</div>
+          <div class="stat-value">18</div>
+          <span class="stat-change warn">⚠ Perlu perhatian</span>
+        </div>
+        <div class="stat-card" style="--accent:var(--red)" onclick="showPage('items')">
+          <div class="stat-icon" style="background:rgba(248,113,113,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <div class="stat-label">Stok Habis</div>
+          <div class="stat-value">5</div>
+          <span class="stat-change down">↓ Segera restok</span>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Stok Masuk & Keluar</div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--lime)"></div>Masuk</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Keluar</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="stockChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Distribusi per Lokasi</div>
+          </div>
+          <div class="chart-wrap"><canvas id="locChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="grid-2">
+        <!-- Recent Transfers -->
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Transfer Terkini</div>
+            <button class="btn btn-xs btn-outline" onclick="showPage('transfer')">Lihat semua</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Barang</th><th>Dari → Ke</th><th>Qty</th><th>Status</th></tr></thead>
+              <tbody id="recent-transfers"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Alerts -->
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Peringatan Stok</div>
+            <button class="btn btn-xs btn-outline" onclick="showPage('notifications')">Lihat semua</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Barang</th><th>Stok</th><th>Min.</th><th>Status</th></tr></thead>
+              <tbody id="stock-alerts"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== ITEMS =================== -->
+    <div class="page" id="page-items">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div class="page-header-title">Manajemen Barang</div>
+          <div class="page-header-sub">247 barang terdaftar dalam sistem</div>
+        </div>
+        <button class="btn btn-primary" onclick="openItemModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Barang
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <input class="form-input" placeholder="Cari nama / kode barang..." style="width:220px;margin:0">
+        <select class="form-input form-select" style="width:150px;margin:0">
+          <option value="">Semua Kategori</option>
+          <option>Router</option><option>Kabel</option><option>Modem</option>
+          <option>Switch</option><option>Aksesoris</option><option>Sparepart</option>
+        </select>
+        <select class="form-input form-select" style="width:150px;margin:0">
+          <option value="">Semua Status</option>
+          <option>Aman</option><option>Hampir Habis</option><option>Habis</option>
+        </select>
+        <select class="form-input form-select" style="width:160px;margin:0">
+          <option>Terbaru</option><option>Stok Terbanyak</option><option>Stok Tersedikit</option>
+        </select>
+        <button class="btn btn-outline btn-sm" style="margin-left:auto">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Export Excel
+        </button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode</th><th>Nama Barang</th><th>Kategori</th>
+                <th>Satuan</th><th>Total Stok</th><th>Min. Stok</th><th>Status</th><th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="items-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== CATEGORIES =================== -->
+    <div class="page" id="page-categories">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div class="page-header-title">Manajemen Kategori</div>
+          <div class="page-header-sub">Kelola kategori barang gudang</div>
+        </div>
+        <button class="btn btn-primary" onclick="openCategoryModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Kategori
+        </button>
+      </div>
+      <div class="grid-3" id="categories-grid"></div>
+    </div>
+
+    <!-- =================== LOCATIONS =================== -->
+    <div class="page" id="page-locations">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div class="page-header-title">Lokasi Gudang</div>
+          <div class="page-header-sub">Kelola lokasi penyimpanan barang</div>
+        </div>
+        <button class="btn btn-primary" onclick="openLocationModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Lokasi
+        </button>
+      </div>
+      <div class="grid-3" id="locations-grid"></div>
+    </div>
+
+    <!-- =================== STOCK IN =================== -->
+    <div class="page" id="page-stock-in">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div class="page-header-title">Stok Masuk</div>
+          <div class="page-header-sub">Tambah stok barang ke lokasi gudang</div>
+        </div>
+        <button class="btn btn-primary" onclick="openStockInModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Input Stok Masuk
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal</th><th>Barang</th><th>Lokasi</th><th>Qty</th><th>Supplier</th><th>Catatan</th><th>User</th></tr></thead>
+            <tbody id="stock-in-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== STOCK OUT =================== -->
+    <div class="page" id="page-stock-out">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div class="page-header-title">Stok Keluar</div>
+          <div class="page-header-sub">Kelola pengeluaran stok barang</div>
+        </div>
+        <button class="btn btn-primary" onclick="openStockOutModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Input Stok Keluar
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal</th><th>Barang</th><th>Lokasi</th><th>Qty</th><th>Tujuan</th><th>Catatan</th><th>User</th></tr></thead>
+            <tbody id="stock-out-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== TRANSFER =================== -->
+    <div class="page" id="page-transfer">
+      <div class="page-header" style="margin-bottom:24px">
+        <div class="page-header-title">Transfer Barang Antar Lokasi</div>
+        <div class="page-header-sub">Pindahkan barang dari satu lokasi ke lokasi lain dengan validasi stok real-time</div>
+      </div>
+
+      <div class="grid-2" style="align-items:start">
+        <!-- TRANSFER FORM -->
+        <div class="transfer-card" id="transfer-form-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+            <div style="width:36px;height:36px;background:var(--lime-glow);border:1px solid var(--lime-border);border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div style="font-family:var(--font2);font-size:16px;font-weight:700">Form Transfer</div>
+              <div style="font-size:12px;color:var(--text2)">Validasi stok otomatis</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Pilih Barang</label>
+            <select class="form-input form-select" id="tf-item" onchange="onTransferItemChange()">
+              <option value="">-- Pilih Barang --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lokasi Asal</label>
+            <select class="form-input form-select" id="tf-from" onchange="onTransferFromChange()">
+              <option value="">-- Pilih Lokasi Asal --</option>
+            </select>
+            <div id="tf-from-info"></div>
+          </div>
+
+          <div class="transfer-arrow">
+            <div class="transfer-arrow-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m-5-5l5 5 5-5"/></svg>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lokasi Tujuan</label>
+            <select class="form-input form-select" id="tf-to" onchange="onTransferToChange()">
+              <option value="">-- Pilih Lokasi Tujuan --</option>
+            </select>
+            <div id="tf-to-info"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Jumlah Transfer</label>
+            <div style="position:relative">
+              <input type="number" class="form-input" id="tf-qty" placeholder="0" min="1" oninput="onQtyChange()">
+              <span id="tf-qty-unit" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px"></span>
+            </div>
+            <div id="tf-qty-err" style="color:var(--red);font-size:12px;margin-top:4px;display:none"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan (Opsional)</label>
+            <textarea class="form-input form-textarea" id="tf-note" placeholder="Alasan transfer, tujuan, dll..."></textarea>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="processTransfer()" id="tf-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+            Proses Transfer
+          </button>
+        </div>
+
+        <!-- TRANSFER HISTORY -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Riwayat Transfer</div>
+            <button class="btn btn-xs btn-outline">Export</button>
+          </div>
+          <div class="table-card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Waktu</th><th>Barang</th><th>Dari → Ke</th><th>Qty</th></tr></thead>
+                <tbody id="transfer-history"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== HISTORY =================== -->
+    <div class="page" id="page-history">
+      <div class="page-header" style="margin-bottom:24px">
+        <div class="page-header-title">Riwayat Aktivitas</div>
+        <div class="page-header-sub">Log semua aktivitas transaksi dan perubahan data</div>
+      </div>
+      <div class="filter-bar">
+        <select class="form-input form-select" style="width:170px;margin:0">
+          <option>Semua Aktivitas</option><option>Stok Masuk</option><option>Stok Keluar</option><option>Transfer</option><option>Perubahan Data</option>
+        </select>
+        <input type="date" class="form-input" style="width:160px;margin:0">
+        <input type="date" class="form-input" style="width:160px;margin:0">
+        <button class="btn btn-outline btn-sm" style="margin-left:auto">Export PDF</button>
+      </div>
+      <div class="card" id="activity-log-list"></div>
+    </div>
+
+    <!-- =================== NOTIFICATIONS =================== -->
+    <div class="page" id="page-notifications">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div class="page-header-title">Notifikasi</div>
+          <div class="page-header-sub">5 notifikasi belum dibaca</div>
+        </div>
+        <button class="btn btn-outline" onclick="markAllRead()">Tandai semua dibaca</button>
+      </div>
+      <div id="notif-page-list"></div>
+    </div>
+
+    <!-- =================== REPORTS =================== -->
+    <div class="page" id="page-reports">
+      <div class="page-header" style="margin-bottom:24px">
+        <div class="page-header-title">Laporan</div>
+        <div class="page-header-sub">Generate dan export laporan stok komprehensif</div>
+      </div>
+      <div class="grid-3">
+        <div class="card" style="cursor:pointer" onclick="showToast('Laporan dibuat','Laporan stok keseluruhan berhasil diexport ke PDF','success')">
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--lime-glow);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+          </div>
+          <div style="font-weight:600;margin-bottom:4px">Laporan Stok Keseluruhan</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Ringkasan semua stok barang per lokasi</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Export PDF</button>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(96,165,250,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div style="font-weight:600;margin-bottom:4px">Laporan per Lokasi</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Stok barang berdasarkan lokasi gudang</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">Export Excel</button>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(251,191,36,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          </div>
+          <div style="font-weight:600;margin-bottom:4px">Barang Hampir Habis</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Daftar barang yang perlu direstok segera</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">Export Excel</button>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(45,212,191,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M12 4v16m0-16l-4 4m4-4l4 4"/></svg>
+          </div>
+          <div style="font-weight:600;margin-bottom:4px">Laporan Stok Masuk</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Riwayat semua penerimaan barang</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">Export Excel</button>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(248,113,113,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M12 20V4m0 16l-4-4m4 4l4-4"/></svg>
+          </div>
+          <div style="font-weight:600;margin-bottom:4px">Laporan Stok Keluar</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Riwayat semua pengeluaran barang</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">Export Excel</button>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(167,139,250,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+          </div>
+          <div style="font-weight:600;margin-bottom:4px">Laporan Transfer</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Riwayat transfer antar lokasi gudang</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">Export Excel</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- =================== MODALS =================== -->
+
+<!-- ITEM MODAL -->
+<div class="modal-overlay" id="modal-item">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Tambah Barang Baru</div>
+      <button class="modal-close" onclick="closeModal('modal-item')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Kode Barang</label><input class="form-input" value="BRG-0248" readonly style="opacity:.6"></div>
+      <div class="form-group"><label class="form-label">Satuan</label><select class="form-input form-select"><option>pcs</option><option>unit</option><option>meter</option><option>roll</option><option>box</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Nama Barang</label><input class="form-input" placeholder="Nama lengkap barang..."></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Kategori</label><select class="form-input form-select"><option>Router</option><option>Kabel</option><option>Modem</option><option>Switch</option><option>Aksesoris</option><option>Sparepart</option></select></div>
+      <div class="form-group"><label class="form-label">Stok Minimum</label><input type="number" class="form-input" placeholder="10"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Upload Gambar</label><input type="file" class="form-input" accept="image/*" style="padding:8px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-item')">Batal</button>
+      <button class="btn btn-primary" onclick="saveItem()">Simpan Barang</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-overlay" id="modal-category">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">Tambah Kategori</div>
+      <button class="modal-close" onclick="closeModal('modal-category')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-group"><label class="form-label">Nama Kategori</label><input class="form-input" placeholder="Nama kategori..."></div>
+    <div class="form-group"><label class="form-label">Deskripsi</label><textarea class="form-input form-textarea" placeholder="Deskripsi singkat kategori..." style="min-height:60px"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-category')">Batal</button>
+      <button class="btn btn-primary" onclick="saveCategory()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION MODAL -->
+<div class="modal-overlay" id="modal-location">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">Tambah Lokasi Gudang</div>
+      <button class="modal-close" onclick="closeModal('modal-location')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-group"><label class="form-label">Nama Lokasi</label><input class="form-input" placeholder="e.g. Gudang Atas, Rak A1..."></div>
+    <div class="form-group"><label class="form-label">Deskripsi</label><textarea class="form-input form-textarea" placeholder="Keterangan lokasi..." style="min-height:60px"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-location')">Batal</button>
+      <button class="btn btn-primary" onclick="saveLocation()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK IN MODAL -->
+<div class="modal-overlay" id="modal-stock-in">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Input Stok Masuk</div>
+      <button class="modal-close" onclick="closeModal('modal-stock-in')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Barang</label><select class="form-input form-select"><option>-- Pilih Barang --</option><option>Kabel LAN Cat6</option><option>Router Mikrotik RB750</option><option>Switch 8 Port</option></select></div>
+      <div class="form-group"><label class="form-label">Lokasi Gudang</label><select class="form-input form-select"><option>-- Pilih Lokasi --</option><option>Gudang Atas</option><option>Gudang Bawah</option><option>Rak A1</option><option>Rak B1</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Jumlah Masuk</label><input type="number" class="form-input" placeholder="0" min="1"></div>
+      <div class="form-group"><label class="form-label">Supplier</label><input class="form-input" placeholder="Nama supplier..."></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tanggal Masuk</label><input type="date" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Catatan</label><input class="form-input" placeholder="Keterangan..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-stock-in')">Batal</button>
+      <button class="btn btn-primary" onclick="saveStockIn()">Simpan Stok Masuk</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK OUT MODAL -->
+<div class="modal-overlay" id="modal-stock-out">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Input Stok Keluar</div>
+      <button class="modal-close" onclick="closeModal('modal-stock-out')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Barang</label><select class="form-input form-select"><option>-- Pilih Barang --</option><option>Kabel LAN Cat6</option><option>Router Mikrotik RB750</option><option>Switch 8 Port</option></select></div>
+      <div class="form-group"><label class="form-label">Lokasi Gudang</label><select class="form-input form-select"><option>-- Pilih Lokasi --</option><option>Gudang Atas</option><option>Gudang Bawah</option><option>Rak A1</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Jumlah Keluar</label><input type="number" class="form-input" placeholder="0" min="1"></div>
+      <div class="form-group"><label class="form-label">Tujuan Penggunaan</label><input class="form-input" placeholder="e.g. Instalasi client, Perbaikan..."></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Catatan</label><input class="form-input" placeholder="Keterangan..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-stock-out')">Batal</button>
+      <button class="btn btn-danger" onclick="saveStockOut()">Konfirmasi Stok Keluar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:400px">
+    <div style="text-align:center;padding:10px 0 20px">
+      <div style="width:56px;height:56px;background:var(--lime-glow);border:2px solid var(--lime-border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      </div>
+      <div style="font-family:var(--font2);font-size:18px;font-weight:700;margin-bottom:8px">Konfirmasi Transfer</div>
+      <div style="color:var(--text2);font-size:14px" id="confirm-msg">Apakah Anda yakin ingin melakukan transfer ini?</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-confirm')">Batal</button>
+      <button class="btn btn-primary" onclick="confirmTransfer()" id="confirm-btn">Ya, Transfer Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======== DATA ========
+const items = [
+  {id:1, code:'BRG-001', name:'Kabel LAN Cat6', category:'Kabel', unit:'meter', min:20, stocks:{1:100,2:50,3:30,4:0,5:20,6:15}},
+  {id:2, code:'BRG-002', name:'Router Mikrotik RB750', category:'Router', unit:'unit', min:5, stocks:{1:3,2:0,3:2,4:0,5:0,6:1}},
+  {id:3, code:'BRG-003', name:'Switch 8 Port TP-Link', category:'Switch', unit:'unit', min:10, stocks:{1:25,2:10,3:5,4:2,5:0,6:3}},
+  {id:4, code:'BRG-004', name:'Modem ADSL Huawei', category:'Modem', unit:'unit', min:8, stocks:{1:0,2:0,3:0,4:0,5:0,6:0}},
+  {id:5, code:'BRG-005', name:'Konektor RJ45 (Box)', category:'Aksesoris', unit:'box', min:30, stocks:{1:80,2:40,3:60,4:20,5:10,6:5}},
+  {id:6, code:'BRG-006', name:'Access Point Ubiquiti', category:'Router', unit:'unit', min:5, stocks:{1:8,2:4,3:0,4:2,5:1,6:0}},
+  {id:7, code:'BRG-007', name:'Kabel Fiber Optic', category:'Kabel', unit:'meter', min:100, stocks:{1:500,2:200,3:0,4:0,5:150,6:0}},
+  {id:8, code:'BRG-008', name:'Patch Panel 24 Port', category:'Switch', unit:'unit', min:3, stocks:{1:2,2:1,3:0,4:0,5:0,6:0}},
+  {id:9, code:'BRG-009', name:'SFP Module 1G', category:'Sparepart', unit:'unit', min:10, stocks:{1:15,2:8,3:0,4:5,5:3,6:2}},
+  {id:10, code:'BRG-010', name:'UPS 1000VA', category:'Aksesoris', unit:'unit', min:3, stocks:{1:5,2:2,3:1,4:0,5:0,6:1}},
+];
+
+const locations = [
+  {id:1, name:'Gudang Atas', desc:'Lantai 2 - Penyimpanan utama barang baru', icon:'🏭', color:'#a3e635'},
+  {id:2, name:'Gudang Bawah', desc:'Lantai 1 - Stok operasional harian', icon:'🏢', color:'#60a5fa'},
+  {id:3, name:'Rak A1', desc:'Area A - Rak pertama baris A', icon:'📦', color:'#fbbf24'},
+  {id:4, name:'Rak A2', desc:'Area A - Rak kedua baris A', icon:'📦', color:'#f97316'},
+  {id:5, name:'Rak B1', desc:'Area B - Rak pertama baris B', icon:'🗃️', color:'#a78bfa'},
+  {id:6, name:'Ruang Teknisi', desc:'Ruangan khusus teknisi lapangan', icon:'🔧', color:'#2dd4bf'},
+];
+
+const categories = [
+  {id:1, name:'Router', desc:'Perangkat routing jaringan', count:24, icon:'📡'},
+  {id:2, name:'Kabel', desc:'Semua jenis kabel jaringan', count:38, icon:'🔌'},
+  {id:3, name:'Modem', desc:'Perangkat modem broadband', count:17, icon:'📶'},
+  {id:4, name:'Switch', desc:'Network switch berbagai ukuran', count:31, icon:'🔀'},
+  {id:5, name:'Aksesoris', desc:'Aksesoris jaringan pelengkap', count:56, icon:'🛠️'},
+  {id:6, name:'Sparepart', desc:'Suku cadang perangkat jaringan', count:42, icon:'⚙️'},
+];
+
+let transferHistory = [
+  {id:1,item:'Kabel LAN Cat6',from:'Gudang Atas',to:'Gudang Bawah',qty:50,unit:'meter',time:'10:32',date:'Hari ini',user:'Admin'},
+  {id:2,item:'Switch 8 Port TP-Link',from:'Rak A1',to:'Ruang Teknisi',qty:3,unit:'unit',time:'09:15',date:'Hari ini',user:'Admin'},
+  {id:3,item:'Access Point Ubiquiti',from:'Gudang Atas',to:'Rak B1',qty:2,unit:'unit',time:'14:20',date:'Kemarin',user:'Staff'},
+];
+
+let stockInHistory = [
+  {id:1,date:'03/05/2026',item:'Kabel LAN Cat6',loc:'Gudang Atas',qty:200,supplier:'PT. Nusantara Network',note:'Pembelian reguler',user:'Admin'},
+  {id:2,date:'02/05/2026',item:'Router Mikrotik RB750',loc:'Gudang Atas',qty:10,supplier:'CV. Mitra Teknologi',note:'',user:'Admin'},
+  {id:3,date:'01/05/2026',item:'Switch 8 Port TP-Link',loc:'Rak A1',qty:15,supplier:'PT. Nusantara Network',note:'Order bulanan',user:'Staff'},
+];
+
+let stockOutHistory = [
+  {id:1,date:'03/05/2026',item:'Kabel LAN Cat6',loc:'Gudang Bawah',qty:30,purpose:'Instalasi Client A',note:'Proyek Sukabumi',user:'Admin'},
+  {id:2,date:'02/05/2026',item:'Router Mikrotik RB750',loc:'Gudang Atas',qty:2,purpose:'Penggantian router rusak',note:'Ticket #2341',user:'Staff'},
+];
+
+const notifications = [
+  {id:1,type:'warn',title:'Stok hampir habis',msg:'Router Mikrotik RB750 — Sisa stok: 6 unit (Min: 5)',time:'10 menit lalu',read:false},
+  {id:2,type:'danger',title:'Stok habis',msg:'Modem ADSL Huawei — Stok 0 di semua lokasi',time:'1 jam lalu',read:false},
+  {id:3,type:'danger',title:'Stok hampir habis',msg:'Patch Panel 24 Port — Sisa stok: 3 unit (Min: 3)',time:'2 jam lalu',read:false},
+  {id:4,type:'success',title:'Transfer berhasil',msg:'50 meter Kabel LAN Cat6 dari Gudang Atas → Gudang Bawah',time:'3 jam lalu',read:false},
+  {id:5,type:'success',title:'Stok masuk berhasil',msg:'200 meter Kabel LAN Cat6 masuk ke Gudang Atas',time:'Kemarin',read:false},
+  {id:6,type:'warn',title:'Stok hampir habis',msg:'Access Point Ubiquiti — Sisa stok: 15 unit (Min: 5)',time:'2 hari lalu',read:true},
+];
+
+const activityLog = [
+  {type:'transfer',icon:'↔',color:'var(--blue)',msg:'Transfer 50 meter <b>Kabel LAN Cat6</b> dari Gudang Atas ke Gudang Bawah',user:'Admin',time:'10:32 — 03 Mei 2026'},
+  {type:'transfer',icon:'↔',color:'var(--blue)',msg:'Transfer 3 unit <b>Switch 8 Port</b> dari Rak A1 ke Ruang Teknisi',user:'Admin',time:'09:15 — 03 Mei 2026'},
+  {type:'in',icon:'↑',color:'var(--lime)',msg:'Stok masuk 200 meter <b>Kabel LAN Cat6</b> ke Gudang Atas dari PT. Nusantara',user:'Admin',time:'08:00 — 03 Mei 2026'},
+  {type:'out',icon:'↓',color:'var(--red)',msg:'Stok keluar 30 meter <b>Kabel LAN Cat6</b> dari Gudang Bawah untuk Instalasi Client A',user:'Staff',time:'15:30 — 02 Mei 2026'},
+  {type:'in',icon:'↑',color:'var(--lime)',msg:'Stok masuk 10 unit <b>Router Mikrotik RB750</b> ke Gudang Atas',user:'Admin',time:'11:00 — 02 Mei 2026'},
+  {type:'edit',icon:'✎',color:'var(--amber)',msg:'Data barang <b>Modem ADSL Huawei</b> diperbarui - stok minimum diubah ke 8',user:'Admin',time:'09:00 — 01 Mei 2026'},
+];
+
+// ======== HELPERS ========
+function getTotalStock(item) {
+  return Object.values(item.stocks).reduce((a,b)=>a+b,0);
+}
+function getStatus(item) {
+  const t = getTotalStock(item);
+  if(t===0) return {label:'Habis',class:'badge-red'};
+  if(t<=item.min) return {label:'Hampir Habis',class:'badge-amber'};
+  return {label:'Aman',class:'badge-green'};
+}
+function getLocationStock(itemId, locId) {
+  const item = items.find(i=>i.id===itemId);
+  return item ? (item.stocks[locId]||0) : 0;
+}
+function fmt(n){return n.toLocaleString('id-ID')}
+function timeNow(){
+  const d=new Date();
+  return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
+
+// ======== NAVIGATION ========
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-dot').forEach(d=>d.style.display='none');
+  const page = document.getElementById('page-'+id);
+  if(page) page.classList.add('active');
+  const navs = document.querySelectorAll('.nav-item');
+  navs.forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")){
+      n.classList.add('active');
+      const dot = n.querySelector('.nav-dot');
+      if(dot) dot.style.display='block';
+    }
+  });
+  const titles = {
+    'dashboard':'Dashboard','items':'Manajemen Barang','categories':'Kategori',
+    'locations':'Lokasi Gudang','stock-in':'Stok Masuk','stock-out':'Stok Keluar',
+    'transfer':'Transfer Barang','history':'Riwayat Aktivitas',
+    'notifications':'Notifikasi','reports':'Laporan'
+  };
+  document.getElementById('topbar-title').textContent = titles[id]||'WMS';
+  if(id==='transfer') renderTransferPage();
+  if(id==='notifications') renderNotifPage();
+  if(id==='history') renderActivityLog();
+}
+
+// ======== THEME ========
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  const icon = document.getElementById('theme-icon');
+  icon.innerHTML = isDark
+    ? '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/>';
+  if(typeof stockChart!=='undefined') updateChartColors();
+}
+
+// ======== MODAL ========
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openItemModal(){openModal('modal-item')}
+function openCategoryModal(){openModal('modal-category')}
+function openLocationModal(){openModal('modal-location')}
+function openStockInModal(){openModal('modal-stock-in')}
+function openStockOutModal(){openModal('modal-stock-out')}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id)});
+});
+
+// ======== TOAST ========
+function showToast(title, msg, type='success') {
+  const container = document.getElementById('toast-container');
+  const icons = {
+    success:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    warning:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>'
+  };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `
+    <div style="flex-shrink:0;margin-top:2px">${icons[type]||icons.success}</div>
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:13px;margin-bottom:2px">${title}</div>
+      <div style="font-size:12px;color:var(--text2)">${msg}</div>
+    </div>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:0;flex-shrink:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>`;
+  container.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)},4000);
+}
+
+// ======== NOTIFICATIONS ========
+function toggleNotif() {
+  const d = document.getElementById('notif-dropdown');
+  d.classList.toggle('open');
+}
+function renderNotifList() {
+  const unread = notifications.filter(n=>!n.read);
+  const badge = document.getElementById('notif-badge');
+  badge.textContent = unread.length;
+  badge.style.display = unread.length ? '' : 'none';
+  
+  const colors = {warn:'var(--amber)',danger:'var(--red)',success:'var(--lime)'};
+  const bgs = {warn:'rgba(251,191,36,.1)',danger:'rgba(248,113,113,.1)',success:'var(--lime-glow)'};
+  const icons = {
+    warn:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>',
+    danger:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    success:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
+  };
+  const html = notifications.map(n=>`
+    <div class="notif-item ${n.read?'':'unread'}" onclick="markRead(${n.id})">
+      <div class="notif-icon-wrap" style="background:${bgs[n.type]};color:${colors[n.type]}">${icons[n.type]}</div>
+      <div class="notif-text">
+        <div class="notif-title">${n.title}</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:2px;line-height:1.4">${n.msg}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      ${!n.read?'<div class="notif-dot"></div>':''}
+    </div>`).join('');
+  document.getElementById('notif-list').innerHTML = html;
+}
+function markRead(id) {
+  const n = notifications.find(n=>n.id===id);
+  if(n) n.read = true;
+  renderNotifList();
+  renderNotifPage();
+}
+function markAllRead() {
+  notifications.forEach(n=>n.read=true);
+  renderNotifList();
+  renderNotifPage();
+  document.getElementById('notif-dropdown').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  const dd = document.getElementById('notif-dropdown');
+  if(!dd.contains(e.target)&&!e.target.closest('.btn-icon')) dd.classList.remove('open');
+});
+
+function renderNotifPage() {
+  const colors = {warn:'var(--amber)',danger:'var(--red)',success:'var(--lime)'};
+  const bgs = {warn:'rgba(251,191,36,.1)',danger:'rgba(248,113,113,.1)',success:'var(--lime-glow)'};
+  const html = notifications.map(n=>`
+    <div class="card" style="margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;${n.read?'opacity:.7':''}">
+      <div style="width:42px;height:42px;border-radius:12px;background:${bgs[n.type]};color:${colors[n.type]};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-weight:600;font-size:14px">${n.title}</span>
+          ${!n.read?'<span class="badge badge-lime" style="font-size:10px">Baru</span>':''}
+        </div>
+        <div style="color:var(--text2);font-size:13px;margin-bottom:6px">${n.msg}</div>
+        <div style="font-size:11px;color:var(--text3)">${n.time}</div>
+      </div>
+      ${!n.read?`<button class="btn btn-xs btn-outline" onclick="markRead(${n.id})">Tandai dibaca</button>`:''}
+    </div>`).join('');
+  const el = document.getElementById('notif-page-list');
+  if(el) el.innerHTML = html;
+}
+
+// ======== ITEMS TABLE ========
+function renderItems() {
+  const rows = items.map(item=>{
+    const total = getTotalStock(item);
+    const status = getStatus(item);
+    return `<tr>
+      <td><span class="badge badge-lime" style="font-family:var(--font2);letter-spacing:.5px;font-size:11px">${item.code}</span></td>
+      <td><div style="font-weight:500">${item.name}</div></td>
+      <td><span class="badge badge-blue">${item.category}</span></td>
+      <td style="color:var(--text2)">${item.unit}</td>
+      <td><span style="font-family:var(--font2);font-weight:600;font-size:15px">${fmt(total)}</span></td>
+      <td style="color:var(--text2)">${item.min}</td>
+      <td><span class="badge ${status.class}">${status.label}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-xs btn-outline">Detail</button>
+          <button class="btn btn-xs btn-outline">Edit</button>
+          <button class="btn btn-xs btn-danger">Hapus</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  const el = document.getElementById('items-table');
+  if(el) el.innerHTML = rows;
+}
+
+// ======== CATEGORIES ========
+function renderCategories() {
+  const colors = ['badge-green','badge-blue','badge-amber','badge-purple','badge-teal','badge-lime'];
+  const html = categories.map((c,i)=>`
+    <div class="card" style="cursor:pointer;transition:all .2s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:28px">${c.icon}</div>
+        <span class="badge ${colors[i%colors.length]}">${c.count} barang</span>
+      </div>
+      <div style="font-family:var(--font2);font-weight:600;font-size:15px;margin-bottom:4px">${c.name}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px">${c.desc}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-xs btn-outline" style="flex:1;justify-content:center">Edit</button>
+        <button class="btn btn-xs btn-danger">Hapus</button>
+      </div>
+    </div>`).join('');
+  const el = document.getElementById('categories-grid');
+  if(el) el.innerHTML = html;
+}
+
+// ======== LOCATIONS ========
+function renderLocations() {
+  const html = locations.map(loc=>{
+    const totalItems = items.filter(i=>Object.keys(i.stocks).includes(loc.id.toString())&&i.stocks[loc.id]>0).length;
+    const totalStock = items.reduce((sum,i)=>sum+(i.stocks[loc.id]||0),0);
+    return `<div class="loc-card">
+      <div class="loc-icon" style="background:${loc.color}22">${loc.icon}</div>
+      <div class="loc-name">${loc.name}</div>
+      <div class="loc-desc">${loc.desc}</div>
+      <div class="loc-stats">
+        <div class="loc-stat"><div class="loc-stat-value">${totalItems}</div><div class="loc-stat-label">Jenis Barang</div></div>
+        <div class="loc-stat"><div class="loc-stat-value" style="color:${loc.color}">${fmt(totalStock)}</div><div class="loc-stat-label">Total Stok</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn btn-xs btn-outline" style="flex:1;justify-content:center">Lihat Stok</button>
+        <button class="btn btn-xs btn-outline">Edit</button>
+        <button class="btn btn-xs btn-danger">Hapus</button>
+      </div>
+    </div>`;
+  }).join('');
+  const el = document.getElementById('locations-grid');
+  if(el) el.innerHTML = html;
+}
+
+// ======== STOCK IN TABLE ========
+function renderStockIn() {
+  const rows = stockInHistory.map(r=>`<tr>
+    <td style="color:var(--text2)">${r.date}</td>
+    <td><span style="font-weight:500">${r.item}</span></td>
+    <td><span class="badge badge-blue">${r.loc}</span></td>
+    <td><span style="font-family:var(--font2);font-weight:600;color:var(--lime)">+${r.qty}</span></td>
+    <td style="color:var(--text2)">${r.supplier}</td>
+    <td style="color:var(--text3)">${r.note||'—'}</td>
+    <td><span class="badge badge-teal">${r.user}</span></td>
+  </tr>`).join('');
+  const el = document.getElementById('stock-in-table');
+  if(el) el.innerHTML = rows;
+}
+
+// ======== STOCK OUT TABLE ========
+function renderStockOut() {
+  const rows = stockOutHistory.map(r=>`<tr>
+    <td style="color:var(--text2)">${r.date}</td>
+    <td><span style="font-weight:500">${r.item}</span></td>
+    <td><span class="badge badge-blue">${r.loc}</span></td>
+    <td><span style="font-family:var(--font2);font-weight:600;color:var(--red)">-${r.qty}</span></td>
+    <td style="color:var(--text2)">${r.purpose}</td>
+    <td style="color:var(--text3)">${r.note||'—'}</td>
+    <td><span class="badge badge-teal">${r.user}</span></td>
+  </tr>`).join('');
+  const el = document.getElementById('stock-out-table');
+  if(el) el.innerHTML = rows;
+}
+
+// ======== TRANSFER ========
+let pendingTransfer = null;
+
+function renderTransferPage() {
+  // Populate item select
+  const tfItem = document.getElementById('tf-item');
+  tfItem.innerHTML = '<option value="">-- Pilih Barang --</option>' +
+    items.map(i=>`<option value="${i.id}">${i.name} (${i.code})</option>`).join('');
+  
+  const tfFrom = document.getElementById('tf-from');
+  tfFrom.innerHTML = '<option value="">-- Pilih Lokasi Asal --</option>' +
+    locations.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  
+  const tfTo = document.getElementById('tf-to');
+  tfTo.innerHTML = '<option value="">-- Pilih Lokasi Tujuan --</option>' +
+    locations.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  
+  renderTransferHistory();
+}
+
+function onTransferItemChange() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const fromId = parseInt(document.getElementById('tf-from').value);
+  if(itemId && fromId) updateFromInfo(itemId, fromId);
+  else document.getElementById('tf-from-info').innerHTML = '';
+  updateQtyUnit();
+}
+
+function onTransferFromChange() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const fromId = parseInt(document.getElementById('tf-from').value);
+  if(itemId && fromId) updateFromInfo(itemId, fromId);
+  validateTransferQty();
+}
+
+function onTransferToChange() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const toId = parseInt(document.getElementById('tf-to').value);
+  if(itemId && toId) updateToInfo(itemId, toId);
+}
+
+function updateQtyUnit() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const item = items.find(i=>i.id===itemId);
+  document.getElementById('tf-qty-unit').textContent = item ? item.unit : '';
+}
+
+function updateFromInfo(itemId, locId) {
+  const item = items.find(i=>i.id===itemId);
+  const loc = locations.find(l=>l.id===locId);
+  if(!item||!loc) return;
+  const stock = item.stocks[locId]||0;
+  const pct = item.min>0 ? Math.min(100,Math.round((stock/Math.max(stock,item.min*3))*100)) : 50;
+  const fillClass = stock===0?'danger':stock<=item.min?'warn':'safe';
+  document.getElementById('tf-from-info').innerHTML = `
+    <div class="stock-info">
+      <div class="stock-info-row">
+        <span class="stock-info-label">Stok di ${loc.name}</span>
+        <span class="stock-info-value" style="color:${stock===0?'var(--red)':stock<=item.min?'var(--amber)':'var(--lime)'}">${fmt(stock)} ${item.unit}</span>
+      </div>
+      <div class="stock-info-row">
+        <span class="stock-info-label">Minimum stok</span>
+        <span style="font-size:12px;color:var(--text2)">${item.min} ${item.unit}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${pct}%"></div></div>
+    </div>`;
+  updateQtyUnit();
+}
+
+function updateToInfo(itemId, locId) {
+  const item = items.find(i=>i.id===itemId);
+  const loc = locations.find(l=>l.id===locId);
+  if(!item||!loc) return;
+  const stock = item.stocks[locId]||0;
+  document.getElementById('tf-to-info').innerHTML = `
+    <div class="stock-info">
+      <div class="stock-info-row">
+        <span class="stock-info-label">Stok saat ini di ${loc.name}</span>
+        <span class="stock-info-value">${fmt(stock)} ${item.unit}</span>
+      </div>
+    </div>`;
+}
+
+function onQtyChange() { validateTransferQty(); }
+
+function validateTransferQty() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const fromId = parseInt(document.getElementById('tf-from').value);
+  const qty = parseInt(document.getElementById('tf-qty').value)||0;
+  const errEl = document.getElementById('tf-qty-err');
+  
+  if(!itemId||!fromId||qty<=0) { errEl.style.display='none'; return; }
+  const item = items.find(i=>i.id===itemId);
+  const stock = item.stocks[fromId]||0;
+  if(qty > stock) {
+    errEl.textContent = `Stok tidak cukup! Tersedia: ${stock} ${item.unit}`;
+    errEl.style.display = 'block';
+  } else {
+    errEl.style.display = 'none';
+  }
+}
+
+function processTransfer() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const fromId = parseInt(document.getElementById('tf-from').value);
+  const toId = parseInt(document.getElementById('tf-to').value);
+  const qty = parseInt(document.getElementById('tf-qty').value)||0;
+  const note = document.getElementById('tf-note').value;
+  
+  if(!itemId) { showToast('Error','Pilih barang terlebih dahulu!','error'); return; }
+  if(!fromId) { showToast('Error','Pilih lokasi asal!','error'); return; }
+  if(!toId) { showToast('Error','Pilih lokasi tujuan!','error'); return; }
+  if(fromId===toId) { showToast('Error','Lokasi asal dan tujuan tidak boleh sama!','error'); return; }
+  if(qty<=0) { showToast('Error','Masukkan jumlah transfer yang valid!','error'); return; }
+  
+  const item = items.find(i=>i.id===itemId);
+  const stock = item.stocks[fromId]||0;
+  if(qty > stock) {
+    showToast('Stok Tidak Cukup',`Stok di lokasi asal hanya ${stock} ${item.unit}`,'error');
+    return;
+  }
+  
+  const fromLoc = locations.find(l=>l.id===fromId);
+  const toLoc = locations.find(l=>l.id===toId);
+  pendingTransfer = {itemId,fromId,toId,qty,note,item,fromLoc,toLoc};
+  document.getElementById('confirm-msg').innerHTML = `Pindahkan <b>${qty} ${item.unit}</b> <b>${item.name}</b><br>dari <b>${fromLoc.name}</b> → <b>${toLoc.name}</b>?`;
+  openModal('modal-confirm');
+}
+
+function confirmTransfer() {
+  if(!pendingTransfer) return;
+  const {itemId,fromId,toId,qty,item,fromLoc,toLoc} = pendingTransfer;
+  
+  // Update stocks
+  item.stocks[fromId] = (item.stocks[fromId]||0) - qty;
+  item.stocks[toId] = (item.stocks[toId]||0) + qty;
+  
+  // Add to history
+  transferHistory.unshift({
+    id:Date.now(),item:item.name,from:fromLoc.name,to:toLoc.name,qty,unit:item.unit,time:timeNow(),date:'Hari ini',user:'Admin'
+  });
+  
+  // Add notification
+  notifications.unshift({
+    id:Date.now(),type:'success',title:'Transfer berhasil',
+    msg:`${qty} ${item.unit} ${item.name} dari ${fromLoc.name} → ${toLoc.name}`,
+    time:'Baru saja',read:false
+  });
+  
+  // Check stock warnings
+  const newStock = item.stocks[fromId];
+  const totalStock = getTotalStock(item);
+  if(totalStock===0) {
+    setTimeout(()=>showToast('⚠ Peringatan Stok',`${item.name} kini habis di semua lokasi!`,'warning'),600);
+    notifications.unshift({id:Date.now()+1,type:'danger',title:'Stok habis',msg:`${item.name} — Stok 0 di semua lokasi`,time:'Baru saja',read:false});
+  } else if(newStock<=item.min&&newStock>0) {
+    setTimeout(()=>showToast('⚠ Stok Hampir Habis',`${item.name} di ${fromLoc.name} tersisa ${newStock} ${item.unit}`,'warning'),600);
+    notifications.unshift({id:Date.now()+1,type:'warn',title:'Stok hampir habis',msg:`${item.name} di ${fromLoc.name} — Sisa: ${newStock} ${item.unit}`,time:'Baru saja',read:false});
+  }
+  
+  closeModal('modal-confirm');
+  showToast('Transfer Berhasil!',`${qty} ${item.unit} ${item.name} dipindahkan ke ${toLoc.name}`,'success');
+  
+  // Reset form
+  document.getElementById('tf-item').value='';
+  document.getElementById('tf-from').value='';
+  document.getElementById('tf-to').value='';
+  document.getElementById('tf-qty').value='';
+  document.getElementById('tf-note').value='';
+  document.getElementById('tf-from-info').innerHTML='';
+  document.getElementById('tf-to-info').innerHTML='';
+  document.getElementById('tf-qty-err').style.display='none';
+  
+  renderTransferHistory();
+  renderNotifList();
+  pendingTransfer = null;
+}
+
+function renderTransferHistory() {
+  const rows = transferHistory.slice(0,10).map(r=>`<tr>
+    <td style="color:var(--text2)">${r.time}<br><span style="font-size:10px;color:var(--text3)">${r.date}</span></td>
+    <td style="font-weight:500">${r.item}</td>
+    <td style="font-size:12px">${r.from} <span style="color:var(--lime)">→</span> ${r.to}</td>
+    <td><span style="font-family:var(--font2);font-weight:600">${r.qty} ${r.unit}</span></td>
+  </tr>`).join('');
+  const el = document.getElementById('transfer-history');
+  if(el) el.innerHTML = rows;
+}
+
+// ======== ACTIVITY LOG ========
+function renderActivityLog() {
+  const colors = {'in':'var(--lime)','out':'var(--red)','transfer':'var(--blue)','edit':'var(--amber)'};
+  const html = activityLog.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${colors[a.type]||'var(--text3)'}"></div>
+      <div style="flex:1">
+        <div style="font-size:13.5px;line-height:1.5">${a.msg}</div>
+        <div style="display:flex;gap:8px;margin-top:4px;align-items:center">
+          <span style="font-size:11px;color:var(--text3)">${a.time}</span>
+          <span class="badge badge-teal" style="font-size:10px;padding:2px 6px">${a.user}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  const el = document.getElementById('activity-log-list');
+  if(el) el.innerHTML = html;
+}
+
+// ======== DASHBOARD ========
+function renderDashboardTables() {
+  // Recent transfers
+  const transfers = document.getElementById('recent-transfers');
+  if(transfers) transfers.innerHTML = transferHistory.slice(0,4).map(r=>`<tr>
+    <td style="font-weight:500;font-size:13px">${r.item}</td>
+    <td style="font-size:12px;color:var(--text2)">${r.from} <span style="color:var(--lime)">→</span> ${r.to}</td>
+    <td><span style="font-family:var(--font2);font-weight:600">${r.qty}</span></td>
+    <td><span class="badge badge-green">Berhasil</span></td>
+  </tr>`).join('');
+  
+  // Stock alerts
+  const alerts = document.getElementById('stock-alerts');
+  if(alerts) {
+    const warnItems = items.filter(i=>{const t=getTotalStock(i);return t<=i.min});
+    alerts.innerHTML = warnItems.slice(0,4).map(item=>{
+      const total=getTotalStock(item);const status=getStatus(item);
+      return `<tr>
+        <td style="font-weight:500;font-size:13px">${item.name}</td>
+        <td><span style="font-family:var(--font2);font-weight:600;color:${total===0?'var(--red)':'var(--amber)'}">${total}</span></td>
+        <td style="color:var(--text2)">${item.min}</td>
+        <td><span class="badge ${status.class}">${status.label}</span></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ======== SAVE ACTIONS ========
+function saveItem() {
+  closeModal('modal-item');
+  showToast('Barang Ditambahkan','Barang baru berhasil disimpan ke sistem','success');
+}
+function saveCategory() {
+  closeModal('modal-category');
+  showToast('Kategori Ditambahkan','Kategori baru berhasil dibuat','success');
+}
+function saveLocation() {
+  closeModal('modal-location');
+  showToast('Lokasi Ditambahkan','Lokasi gudang baru berhasil didaftarkan','success');
+}
+function saveStockIn() {
+  closeModal('modal-stock-in');
+  showToast('Stok Masuk Berhasil','Data penerimaan stok berhasil disimpan','success');
+  notifications.unshift({id:Date.now(),type:'success',title:'Stok masuk berhasil',msg:'Stok berhasil ditambahkan ke sistem',time:'Baru saja',read:false});
+  renderNotifList();
+}
+function saveStockOut() {
+  closeModal('modal-stock-out');
+  showToast('Stok Keluar Dicatat','Pengeluaran stok berhasil disimpan','success');
+}
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ======== CHARTS ========
+let stockChart, locChart;
+
+function initCharts() {
+  const gridColor = 'rgba(255,255,255,0.04)';
+  const labels = ['Jan','Feb','Mar','Apr','Mei'];
+  
+  const ctx1 = document.getElementById('stockChart');
+  if(!ctx1) return;
+  stockChart = new Chart(ctx1, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Masuk',data:[320,410,390,520,480],backgroundColor:'rgba(163,230,53,0.7)',borderRadius:6,borderSkipped:false},
+        {label:'Keluar',data:[240,300,280,380,350],backgroundColor:'rgba(248,113,113,0.6)',borderRadius:6,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(15,17,23,0.9)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,titleColor:'#f0f2f8',bodyColor:'#8892a4'}},
+      scales:{
+        x:{grid:{color:gridColor},ticks:{color:'#55627a',font:{family:'DM Sans',size:11}}},
+        y:{grid:{color:gridColor},ticks:{color:'#55627a',font:{family:'DM Sans',size:11}},border:{dash:[4,4]}}
+      }
+    }
+  });
+  
+  const ctx2 = document.getElementById('locChart');
+  if(!ctx2) return;
+  locChart = new Chart(ctx2, {
+    type:'doughnut',
+    data:{
+      labels:locations.map(l=>l.name),
+      datasets:[{
+        data:locations.map(l=>items.reduce((s,i)=>s+(i.stocks[l.id]||0),0)),
+        backgroundColor:['rgba(163,230,53,.7)','rgba(96,165,250,.7)','rgba(251,191,36,.7)','rgba(249,115,22,.7)','rgba(167,139,250,.7)','rgba(45,212,191,.7)'],
+        borderColor:'transparent',borderWidth:3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{color:'#8892a4',font:{family:'DM Sans',size:11},padding:12,usePointStyle:true,pointStyleWidth:8}},
+        tooltip:{backgroundColor:'rgba(15,17,23,0.9)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,titleColor:'#f0f2f8',bodyColor:'#8892a4'}
+      },
+      cutout:'65%'
+    }
+  });
+}
+
+// ======== INIT ========
+window.onload = function() {
+  renderItems();
+  renderCategories();
+  renderLocations();
+  renderStockIn();
+  renderStockOut();
+  renderNotifList();
+  renderDashboardTables();
+  initCharts();
+  
+  // Mobile menu button
+  if(window.innerWidth<=768) {
+    document.getElementById('menu-btn').style.display='flex';
+  }
+};
+</script>
+</body>
+</html>
