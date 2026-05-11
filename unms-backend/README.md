@@ -7,7 +7,8 @@ NestJS API for UNMS Billing System (ISP/NAP scale). This folder is independent f
 - BE-0003 (Prisma + MySQL setup) — done
 - BE-0004 (core database schema lengkap + seed RBAC) — done
 - BE-0101 (CustomerCodeService — atomic global counter + Jest setup + 15 tests) — done
-- BE-0102 (ServiceSecretGenerator), BE-0002 (full docker-compose stack), BE-0201 (auth wiring), modul bisnis — menyusul.
+- BE-0102 (ServiceSecretGenerator — unique pppoe_username + radcheck + retry + 24 tests) — done
+- BE-0002 (full docker-compose stack), BE-0201 (auth wiring), modul bisnis — menyusul.
 
 ## Stack (target)
 - NestJS 11 + TypeScript strict
@@ -75,6 +76,19 @@ src/
 - [x] `/health` returns API/DB/Redis status payload
 - [x] All env vars validated at startup (`validateEnv`)
 - [x] Error response shape consistent across all thrown exceptions
+
+## Acceptance Criteria (BE-0102)
+- [x] `ServiceSecretGenerator.generate(customerCode)` produces `{ username, password }`
+- [x] Username = `{customerCode}_{randomN}` (N dari `system_settings.service.secret.random_length`, default 4)
+- [x] Username unique across **both** `services.pppoe_username` AND `radcheck.username` (FreeRadius)
+- [x] Retry on collision (default 8 attempts) → throws `ServiceSecretCollisionError` kalau exhausted
+- [x] Password 12 char default, crypto-secure (`crypto.randomInt`), non-confusable charset
+- [x] Username charset 32 chars non-confusable (32⁴ ≈ 1M combos per customer)
+- [x] Supports passing outer `Prisma.TransactionClient` (consistent dengan BE-0101 pattern)
+- [x] 24 tests passing (17 unit, 7 integration)
+- [x] Concurrency test: 50 parallel → all unique
+- [x] Collision exhaustion test: pre-fill 1024 radcheck rows, `randomLength=2`, `maxRetries=5` → throws
+- [x] `npm run build` & `npm run lint` OK
 
 ## Acceptance Criteria (BE-0101)
 - [x] `CustomerCodeService.generateCustomerCode()` produces `{PREFIX}{YY}{MM}{NNNN}` (e.g. `REG26050042`)
