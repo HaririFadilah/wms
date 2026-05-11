@@ -5,7 +5,8 @@ NestJS API for UNMS Billing System (ISP/NAP scale). This folder is independent f
 ## Status
 - BE-0001 (foundation) — done
 - BE-0003 (Prisma + MySQL setup) — done
-- BE-0002 (full docker-compose stack), BE-0004 (full schema), BE-0201 (auth), modul bisnis — menyusul.
+- BE-0004 (core database schema lengkap + seed RBAC) — done
+- BE-0002 (full docker-compose stack), BE-0201 (auth wiring), modul bisnis — menyusul.
 
 ## Stack (target)
 - NestJS 11 + TypeScript strict
@@ -73,6 +74,21 @@ src/
 - [x] `/health` returns API/DB/Redis status payload
 - [x] All env vars validated at startup (`validateEnv`)
 - [x] Error response shape consistent across all thrown exceptions
+
+## Acceptance Criteria (BE-0004)
+- [x] Schema lengkap untuk seluruh domain UNMS (auth, customer, service, billing, network, radius, ticketing, summary)
+- [x] Index strategy untuk skala 500k+ (`customers(code)` unique, `services(pppoe_username)` unique, composite indexes pada (status, dueDate), (customer_id, status), dsb)
+- [x] FreeRadius standard tables (`radcheck`, `radreply`, `radusergroup`, `radgroupcheck`, `radgroupreply`, `radacct`, `radpostauth`, `nas`) ikut di-manage Prisma
+- [x] 7 summary tables siap dipakai dashboard tanpa scan tabel utama
+- [x] Seed:
+  - 53 permissions (15 group)
+  - 5 system roles (superadmin/admin/finance/technician/csr) dengan permission mapping
+  - 1 superadmin user (`admin@unms.local` / `admin123` — ROTATE)
+  - 9 default `system_settings` (timezone, currency, customer_code prefix, dll)
+  - 1 counter `customer_global_sequence`
+- [x] Seed idempotent (re-run tidak duplikat)
+- [x] `npm run build` & `npm run lint` OK
+- [x] Server start + `/health` `db: "up"` masih bekerja
 
 ## Acceptance Criteria (BE-0003)
 - [x] Prisma migration berhasil (`npm run prisma:migrate:dev` membuat `_prisma_migrations`, `system_counters`, `system_settings`)
