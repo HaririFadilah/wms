@@ -8,6 +8,7 @@ import { PrismaModule } from '@/database/prisma.module';
 import { validateEnv } from '@/config/env.validation';
 import { CustomerCodeModule } from '@/modules/customer-code/customer-code.module';
 import { HealthModule } from '@/modules/health/health.module';
+import { ServiceSecretModule } from '@/modules/service-secret/service-secret.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HealthModule } from '@/modules/health/health.module';
     }),
     PrismaModule,
     CustomerCodeModule,
+    ServiceSecretModule,
     HealthModule,
   ],
   providers: [
