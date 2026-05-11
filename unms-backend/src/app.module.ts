@@ -6,6 +6,7 @@ import { LoggingInterceptor } from '@/common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 import { PrismaModule } from '@/database/prisma.module';
 import { validateEnv } from '@/config/env.validation';
+import { CustomerCodeModule } from '@/modules/customer-code/customer-code.module';
 import { HealthModule } from '@/modules/health/health.module';
 
 @Module({
@@ -17,6 +18,7 @@ import { HealthModule } from '@/modules/health/health.module';
       envFilePath: ['.env', '.env.local'],
     }),
     PrismaModule,
+    CustomerCodeModule,
     HealthModule,
   ],
   providers: [

@@ -35,11 +35,18 @@ DATABASE_URL=mysql://USER:PASS@HOST:PORT/DBNAME
 - Gunakan `select` spesifik di setiap query — hindari load semua kolom.
 - Hindari `include` relasi berlebihan untuk endpoint list (N+1 risk).
 - Semua endpoint list wajib pagination (`page`, `limit`), `limit` default ≤ 100.
-- Counter atomik (mis. `customer_global_sequence`) wajib di-update di dalam transaksi:
+- Counter atomik (mis. `customer_global_sequence`) wajib di-update di dalam transaksi dengan row lock:
   ```ts
   await prisma.runInTransaction(async (tx) => {
-    const row = await tx.$queryRaw`SELECT current_value FROM system_counters WHERE key='customer_global_sequence' FOR UPDATE`;
+    const row = await tx.$queryRaw`SELECT current_value FROM system_counters WHERE \`key\`='customer_global_sequence' FOR UPDATE`;
     // ... compute next value, update, insert customer ...
   });
   ```
-  Detail implementasi ada di task BE-0101 (CustomerCodeService).
+  Sudah di-implement: `CustomerCodeService` (BE-0101) — jangan duplikasi pola ini, inject service-nya saja.
+  ```ts
+  // BE-0301 contoh:
+  await prisma.runInTransaction(async (tx) => {
+    const code = await customerCodeService.generateCustomerCode(tx);
+    await tx.customer.create({ data: { customerCode: code, /* ... */ } });
+  });
+  ```
