@@ -1,0 +1,38 @@
+# Minimal dev environment for UNMS backend (BE-0003 scope).
+# Full BE-0002 stack (FreeRadius + Redis tuned + named volumes) menyusul.
+#
+# Usage:
+#   docker compose -f docker-compose.unms.dev.yml up -d
+#   docker compose -f docker-compose.unms.dev.yml down -v
+services:
+  unms-mysql:
+    image: mysql:8.0
+    container_name: unms-mysql
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=caching_sha2_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=500
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: unms
+      MYSQL_USER: unms
+      MYSQL_PASSWORD: unms
+    ports:
+      - "3306:3306"
+    volumes:
+      - unms-mysql-data:/var/lib/mysql
+
+  unms-redis:
+    image: redis:7-alpine
+    container_name: unms-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - unms-redis-data:/data
+
+volumes:
+  unms-mysql-data:
+  unms-redis-data:
