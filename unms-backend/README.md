@@ -6,7 +6,8 @@ NestJS API for UNMS Billing System (ISP/NAP scale). This folder is independent f
 - BE-0001 (foundation) — done
 - BE-0003 (Prisma + MySQL setup) — done
 - BE-0004 (core database schema lengkap + seed RBAC) — done
-- BE-0002 (full docker-compose stack), BE-0201 (auth wiring), modul bisnis — menyusul.
+- BE-0101 (CustomerCodeService — atomic global counter + Jest setup + 15 tests) — done
+- BE-0102 (ServiceSecretGenerator), BE-0002 (full docker-compose stack), BE-0201 (auth wiring), modul bisnis — menyusul.
 
 ## Stack (target)
 - NestJS 11 + TypeScript strict
@@ -74,6 +75,17 @@ src/
 - [x] `/health` returns API/DB/Redis status payload
 - [x] All env vars validated at startup (`validateEnv`)
 - [x] Error response shape consistent across all thrown exceptions
+
+## Acceptance Criteria (BE-0101)
+- [x] `CustomerCodeService.generateCustomerCode()` produces `{PREFIX}{YY}{MM}{NNNN}` (e.g. `REG26050042`)
+- [x] Counter `customer_global_sequence` is **GLOBAL** and never reset (verified by tests)
+- [x] Row-lock via `SELECT ... FOR UPDATE` inside `SERIALIZABLE` transaction
+- [x] Supports passing an outer `Prisma.TransactionClient` (atomic with caller's other writes)
+- [x] Rollback in outer tx **undoes** the counter increment (atomic guarantee verified)
+- [x] Concurrency test: 100 parallel calls → all codes unique, counter += 100
+- [x] Jest setup (test runner, ts-jest, BigInt JSON helper)
+- [x] 15 tests passing (10 unit, 5 integration)
+- [x] `npm run build` & `npm run lint` OK
 
 ## Acceptance Criteria (BE-0004)
 - [x] Schema lengkap untuk seluruh domain UNMS (auth, customer, service, billing, network, radius, ticketing, summary)
