@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '@/database/prisma.service';
 import { EnvironmentVariables } from '@/config/env.validation';
 
 interface HealthCheckResult {
@@ -17,23 +18,36 @@ interface HealthCheckResult {
 
 @Controller('health')
 export class HealthController {
-  constructor(private readonly config: ConfigService<EnvironmentVariables, true>) {}
+  constructor(
+    private readonly config: ConfigService<EnvironmentVariables, true>,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @Get()
-  check(): HealthCheckResult {
+  async check(): Promise<HealthCheckResult> {
     const appName = this.config.get('APP_NAME', { infer: true });
     const dbUrl = this.config.get('DATABASE_URL', { infer: true });
     const redisHost = this.config.get('REDIS_HOST', { infer: true });
 
+    let db: HealthCheckResult['checks']['db'] = 'not_configured';
+    if (dbUrl) {
+      try {
+        await this.prisma.ping();
+        db = 'up';
+      } catch {
+        db = 'down';
+      }
+    }
+
     return {
-      status: 'ok',
+      status: db === 'down' ? 'degraded' : 'ok',
       service: appName,
       version: '0.1.0',
       uptimeSec: Math.round(process.uptime()),
       timestamp: new Date().toISOString(),
       checks: {
         api: 'up',
-        db: dbUrl ? 'not_configured' : 'not_configured',
+        db,
         redis: redisHost ? 'not_configured' : 'not_configured',
       },
     };

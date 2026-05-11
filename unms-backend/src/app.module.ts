@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from '@/common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { PrismaModule } from '@/database/prisma.module';
 import { validateEnv } from '@/config/env.validation';
 import { HealthModule } from '@/modules/health/health.module';
 
@@ -15,6 +16,7 @@ import { HealthModule } from '@/modules/health/health.module';
       validate: validateEnv,
       envFilePath: ['.env', '.env.local'],
     }),
+    PrismaModule,
     HealthModule,
   ],
   providers: [

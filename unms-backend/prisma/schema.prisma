@@ -1,0 +1,40 @@
+// UNMS Billing System - Prisma schema
+//
+// BE-0003 scope: foundation only. Schema lengkap (customers, services, invoices,
+// transactions, radius_*, audit_logs, summary tables, dst) akan ditambahkan di BE-0004.
+//
+// Yang dimasukkan di sini hanya 2 tabel inti:
+// - system_settings : key/value settings global
+// - system_counters : counter atomik (mis. customer_global_sequence) yang dipakai
+//                     CustomerCodeService di BE-0101.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SystemSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique @db.VarChar(120)
+  value     String   @db.Text
+  group     String?  @db.VarChar(60)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+model SystemCounter {
+  id           Int      @id @default(autoincrement())
+  key          String   @unique @db.VarChar(120)
+  currentValue BigInt   @default(0) @map("current_value")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("system_counters")
+}
