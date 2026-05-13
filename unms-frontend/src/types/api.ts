@@ -41,10 +41,11 @@ export interface AuthUser {
   permissions: string[];
 }
 
-export interface LoginResponse {
+export interface TokenPair {
   accessToken: string;
   refreshToken: string;
   tokenType: 'Bearer';
   expiresIn: number;
-  user: AuthUser;
 }
+
+export type LoginResponse = TokenPair & { user: AuthUser };

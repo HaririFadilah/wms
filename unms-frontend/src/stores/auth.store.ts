@@ -1,17 +1,23 @@
-// Auth store (Zustand). Skeleton only — full login/refresh wiring lands in FE-0101.
-// We persist tokens to localStorage so a refresh doesn't drop the session. Be aware
-// localStorage isn't an XSS-proof vault; we'll revisit (httpOnly cookie + CSRF) when
-// the backend supports it. For Sprint 1 demo this is acceptable.
+// Auth store (Zustand). Persists user + tokens to localStorage so a hard refresh
+// doesn't drop the session. Tokens in localStorage are NOT XSS-proof; we'll
+// revisit (httpOnly cookie + CSRF) when the backend supports it.
+//
+// Actions:
+// - loginAndStore: call POST /auth/login + populate store
+// - logout: best-effort POST /auth/logout + clear store
+// - clearSession: synchronous local-only clear (used by interceptor)
+// - setSession: low-level setter (also used by interceptor on /refresh success)
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { AuthUser } from '@/types/api';
+import { authApi, type LoginInput } from '@/lib/api-routes';
 
 interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
   refreshToken: string | null;
-  /** True once we've hydrated from storage (avoids SSR/initial-render flicker). */
+  /** True once the store has hydrated from storage (avoids SSR/initial flicker). */
   hasHydrated: boolean;
 
   setSession: (args: {
@@ -22,7 +28,9 @@ interface AuthState {
   clearSession: () => void;
   setHasHydrated: (v: boolean) => void;
 
-  /** Convenience selector — does the user hold ALL listed permission codes? */
+  loginAndStore: (input: LoginInput) => Promise<AuthUser>;
+  logout: () => Promise<void>;
+
   hasAllPermissions: (codes: readonly string[]) => boolean;
 }
 
@@ -40,6 +48,25 @@ export const useAuthStore = create<AuthState>()(
       clearSession: () => set({ user: null, accessToken: null, refreshToken: null }),
 
       setHasHydrated: (v) => set({ hasHydrated: v }),
+
+      loginAndStore: async (input) => {
+        const res = await authApi.login(input);
+        set({
+          user: res.user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        });
+        return res.user;
+      },
+
+      logout: async () => {
+        try {
+          await authApi.logout();
+        } catch {
+          // Best-effort — network/auth errors must NOT block local cleanup.
+        }
+        set({ user: null, accessToken: null, refreshToken: null });
+      },
 
       hasAllPermissions: (codes) => {
         const perms = get().user?.permissions;
