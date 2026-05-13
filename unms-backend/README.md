@@ -8,7 +8,8 @@ NestJS API for UNMS Billing System (ISP/NAP scale). This folder is independent f
 - BE-0004 (core database schema lengkap + seed RBAC) — done
 - BE-0101 (CustomerCodeService — atomic global counter + Jest setup + 15 tests) — done
 - BE-0102 (ServiceSecretGenerator — unique pppoe_username + radcheck + retry + 24 tests) — done
-- BE-0002 (full docker-compose stack), BE-0201 (auth wiring), modul bisnis — menyusul.
+- BE-0201 (Auth & RBAC — JWT login/refresh/me, @Public, @CurrentUser, @RequirePermissions, global guards, 32 tests) — done
+- BE-0002 (full docker-compose stack), modul bisnis — menyusul.
 
 ## Stack (target)
 - NestJS 11 + TypeScript strict
@@ -76,6 +77,23 @@ src/
 - [x] `/health` returns API/DB/Redis status payload
 - [x] All env vars validated at startup (`validateEnv`)
 - [x] Error response shape consistent across all thrown exceptions
+
+## Acceptance Criteria (BE-0201)
+- [x] `POST /api/v1/auth/login` (email atau username) → 200 + `{ accessToken, refreshToken, tokenType:'Bearer', expiresIn, user }`
+- [x] `POST /api/v1/auth/refresh` → access+refresh baru; tolak token type=`access` yang dipakai sebagai refresh
+- [x] `GET /api/v1/auth/me` (JWT required) → profile + `roles[]` + `permissions[]` (flat dari semua role)
+- [x] `POST /api/v1/auth/logout` → 204 (client-side drop; revocation server-side defer ke BE-0202)
+- [x] Global `JwtAuthGuard` (skip routes ber-`@Public()`)
+- [x] Global `PermissionsGuard` (cek `@RequirePermissions('code1','code2')`, AND semantics)
+- [x] `@CurrentUser()` param decorator inject typed `AuthenticatedUser`
+- [x] Validasi env: `JWT_ACCESS_SECRET` & `JWT_REFRESH_SECRET` REQUIRED, TTL min 60 detik
+- [x] Password hashing via bcryptjs (cost dari `BCRYPT_ROUNDS`, default 10)
+- [x] Constant-time validateUser (compare against dummy hash bila user tidak ada)
+- [x] 401 untuk auth failure dengan pesan konstan `"Invalid credentials"` (no enumeration leak)
+- [x] 403 untuk permission failure dengan list permission yang hilang
+- [x] 32 tests passing (14 unit AuthService + 5 unit PermissionsGuard + 13 integration end-to-end via supertest)
+- [x] `npm run build` & `npm run lint` OK
+- [x] `/health` tetap public (`@Public()`)
 
 ## Acceptance Criteria (BE-0102)
 - [x] `ServiceSecretGenerator.generate(customerCode)` produces `{ username, password }`

@@ -2,6 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/database/prisma.service';
 import { EnvironmentVariables } from '@/config/env.validation';
+import { Public } from '@/modules/auth/decorators/public.decorator';
 
 interface HealthCheckResult {
   status: 'ok' | 'degraded';
@@ -16,6 +17,7 @@ interface HealthCheckResult {
   };
 }
 
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(
