@@ -42,21 +42,30 @@ export class EnvironmentVariables {
   @IsOptional()
   REDIS_PASSWORD?: string;
 
+  // JWT_ACCESS_SECRET / JWT_REFRESH_SECRET are required for the auth module to issue tokens.
+  // They MUST be set to long random strings in production. Dev/test get sensible defaults
+  // via .env.example so the app boots out-of-the-box.
   @IsString()
-  @IsOptional()
-  JWT_ACCESS_SECRET?: string;
+  JWT_ACCESS_SECRET!: string;
 
   @IsString()
-  @IsOptional()
-  JWT_REFRESH_SECRET?: string;
+  JWT_REFRESH_SECRET!: string;
 
+  /** Access token TTL in seconds (default 15 min). */
   @IsInt()
-  @IsOptional()
-  JWT_ACCESS_TTL?: number;
+  @Min(60)
+  JWT_ACCESS_TTL: number = 15 * 60;
 
+  /** Refresh token TTL in seconds (default 7 days). */
   @IsInt()
-  @IsOptional()
-  JWT_REFRESH_TTL?: number;
+  @Min(60)
+  JWT_REFRESH_TTL: number = 7 * 24 * 60 * 60;
+
+  /** Bcrypt cost for password hashing (default 10). */
+  @IsInt()
+  @Min(4)
+  @Max(15)
+  BCRYPT_ROUNDS: number = 10;
 
   @IsString()
   @IsOptional()
